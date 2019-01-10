@@ -78,6 +78,9 @@
     <ClInclude Include="src\tools\include\stringUtil.h" />
     <ClInclude Include="src\tools\include\threads.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="LCD1602-datasheet.pdf" />
+  </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
       <AdditionalOptions>-lpthread -lwiringPiDev</AdditionalOptions>

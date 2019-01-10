@@ -27,9 +27,6 @@
 static volatile int dhtPin = 29;
 
 
-
-
-
  // Global Variables
 static unsigned int lcdAddress;
 static int          tries = 5;
