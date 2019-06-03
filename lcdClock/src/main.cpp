@@ -39,6 +39,10 @@ static volatile float humidity = -9999;
 static volatile float temperature = -9999;
 
 int marquee = 0;
+
+
+#define lcdWidth 16
+#define maxMessageSize 128
 char msg[1024];
 
 
@@ -47,7 +51,7 @@ bool usage() {
 	fprintf(stderr, "d = daemon mode\n");
 	fprintf(stderr, "a = hexadecimal i2c address ($gpio i2cd)\n");
 	fprintf(stderr, "p = dht wiringPi pin number\n");
-	fprintf(stderr, "m = message of the day, max 14 characters\n");
+	fprintf(stderr, "m = message of the day, max %d characters\n", maxMessageSize);
 	fprintf(stderr, "s = marquee speed (ms)\n");
 	fprintf(stderr, "f = clock format\n");
 	fprintf(stderr, "    1 - Weekday Month Date HH24:SS\n");
@@ -105,7 +109,7 @@ bool commandLineOptions(int argc, char **argv) {
 			break;
 		case 'm':
 			strncpy(msg, optarg, sizeof(msg));
-			if (strlen(msg) > 14) {
+			if (strlen(msg) > maxMessageSize) {
 				fprintf(stderr, "message is too long, max size is 14 characters.\n");
 				return usage();
 			}
@@ -208,28 +212,49 @@ void updateClock() {
 		lcdPosition(lcdHandle, 0, 1);
 		char humi[32];
 		char temp[32];
-		char tmpstr1[64];
-		char tmpstr2[128];
+		char tmpstr1[1024];
+		char tmpstr2[2048];
 		sprintf(humi, "H:%.0f%%", humidity);
 		sprintf(temp, "T:%.0f%cF", temperature, 0xdf);
 
-		if (strlen(msg) > 0) {
+		int maxMessageLength = lcdWidth - 4;
 
-			sprintf(tmpstr2, "%16s", "");
-			sprintf(&tmpstr2[(16 - strlen(msg)) / 2], "%s", msg);
-			sprintf(tmpstr1, "%-6.6s  %-6.6s  %-16.16s", humi, temp, tmpstr2);
-			sprintf(tmpstr2, "%s%s", tmpstr1, tmpstr1);
+		if (strlen(msg) > 0 && strlen(msg)<=maxMessageLength) {
+
+			sprintf(tmpstr2, "%*s", lcdWidth, "");
+			sprintf(&tmpstr2[(lcdWidth - strlen(msg)) / 2], "%s", msg);
+			sprintf(tmpstr1, "%-6.6s  %-6.6s  %-*.*s", humi, temp, lcdWidth, lcdWidth, tmpstr2);
+			sprintf(tmpstr2, "%s  %s  ", tmpstr1, tmpstr1);
 			if (!daemonMode) {
 				printf("%s\n", tmpstr1);
 			}
-			tmpstr2[marquee + 16] = 0;
+			tmpstr2[marquee + lcdWidth] = 0;
+
 			lcdPuts(lcdHandle, &tmpstr2[marquee++]);
+
 			if (marquee > strlen(tmpstr1) - 1) {
 				marquee = 0;
 			}
-		}
-		else {
+		} else if (strlen(msg) > 0) {
+			sprintf(tmpstr1, "%-6.6s  %-6.6s  %s", humi, temp, msg);
+			sprintf(tmpstr2, "%s  %s  ", tmpstr1, tmpstr1);
+			if (!daemonMode) {
+				printf("%s\n", tmpstr1);
+			}
+			tmpstr2[marquee + lcdWidth] = 0;
+
+			lcdPuts(lcdHandle, &tmpstr2[marquee++]);
+
+			if (marquee > strlen(tmpstr1) - 1) {
+				marquee = 0;
+			}
+		} else {
+
+
 			lcdPrintf(lcdHandle, "%-8.8s%8.8s", humi, temp);
+			if (!daemonMode) {
+				printf("%-8.8s %-8.8s", humi, temp);
+			}
 		}
 	}
 
