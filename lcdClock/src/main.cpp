@@ -281,7 +281,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-
+    printf("clock address 0x%02x; dht22pin=%d\n", lcdAddress, dhtPin);
 
 	threadCreate(readDHT22Loop, "read dht sensor");
 	printf("updating clock... speed=%dms\n", marqueeSpeed);
