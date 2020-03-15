@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7b4f2538-7c34-4658-838b-0eef4fd09342}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>lcdClock</RootNamespace>
+    <RootNamespace>piClock</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
@@ -79,11 +79,11 @@
     <ClInclude Include="src\tools\include\threads.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="LCD1602-datasheet.pdf" />
+    <None Include="readme\LCD1602-datasheet.pdf" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <AdditionalOptions>-lpthread -lwiringPiDev</AdditionalOptions>
+      <AdditionalOptions>-lpthread -lwiringPiDev -lwiringPiUDDrpi</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
