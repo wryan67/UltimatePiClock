@@ -19,26 +19,28 @@
 #include <chrono>
 #include <ctime>  
 
-#include "./tools/include/dht22.h"
+
+#include <udd.h>
+#include <bme280rpi.h>
+
 #include "./tools/include/threads.h"
 #include "./tools/include/pcf8574io.h"
-#include "./tools/include/lcd.h"
-
-static volatile int dhtPin = 29;
 
 
  // Global Variables
-static unsigned int lcdAddress;
-static int          tries = 5;
 static char         dateFormat = '1';
-static volatile int lcdHandle;
 static volatile int marqueeSpeed = 400;
 
 static volatile bool daemonMode = false;
 static volatile float humidity = -9999;
 static volatile float temperature = -9999;
-
 int marquee = 0;
+
+// bme280 info
+int bme280_address = 0x76;
+bme280_calib_data cal;
+int bme280_fd;
+
 
 
 #define lcdWidth 16
@@ -47,10 +49,9 @@ char msg[1024];
 
 
 bool usage() {
-	fprintf(stderr, "usage: lcdClock [-d] [-a 00-FF] [-p 0-40] [-f n] [-s speed] [-m motd]\n");
+	fprintf(stderr, "usage: lcdClock [-d] [-b 00-FF] [-p 0-40] [-f n] [-s speed] [-m motd]\n");
 	fprintf(stderr, "d = daemon mode\n");
-	fprintf(stderr, "a = hexadecimal i2c address ($gpio i2cd)\n");
-	fprintf(stderr, "p = dht wiringPi pin number\n");
+	fprintf(stderr, "b = bme280 address (hex)\n");
 	fprintf(stderr, "m = message of the day, max %d characters\n", maxMessageSize);
 	fprintf(stderr, "s = marquee speed (ms)\n");
 	fprintf(stderr, "f = clock format\n");
@@ -79,15 +80,9 @@ bool setup() {
 	fclose(fp);
 	srand(seed);
 
-	//  the following statements setup the proper input or output for their respective 
-	//  inputs or outputs
-	pinMode(dhtPin, INPUT);
+    bme280_fd=bme280_standardSetup(bme280_address, &cal);
 
-	lcdHandle=lcdSetup(lcdAddress);
-	if (lcdHandle < 0) {
-		fprintf(stderr, "lcdInit failed\n");
-		return false;
-	}
+
 	return true;
 }
 
@@ -99,13 +94,10 @@ bool commandLineOptions(int argc, char **argv) {
 		return usage();
 	}
 
-	while ((c = getopt(argc, argv, "da:p:f:m:s:")) != -1)
+	while ((c = getopt(argc, argv, "db:f:m:s:")) != -1)
 		switch (c) {
 		case 'd':
 			daemonMode = true;
-			break;
-		case 'a':
-			sscanf(optarg, "%x", &lcdAddress);
 			break;
 		case 'm':
 			strncpy(msg, optarg, sizeof(msg));
@@ -114,8 +106,8 @@ bool commandLineOptions(int argc, char **argv) {
 				return usage();
 			}
 			break;
-		case 'p':
-			sscanf(optarg, "%d", &dhtPin);
+		case 'b':
+			sscanf(optarg, "%x", &bme280_address);
 			break;
 		case 's':
 			sscanf(optarg, "%d", &marqueeSpeed);
@@ -160,18 +152,28 @@ static uint8_t sizecvt(const int read)
 
 
 
-void *readDHT22Loop(void *) {
+void *readBME280Loop(void *) {
 	float h;
 	float t;
+    bme280_raw_data raw;
 
 	while (true) {
-		if (readDHT22Data(dhtPin, &h, &t)) {
-			humidity = h;
-			temperature = t;
-			delay(5000);
-		} else {
-			delay(1500);
-		}
+        bme280_getRawData(bme280_fd, &raw);
+
+        int32_t t_fine = bme280_getTemperatureCalibration(&cal, raw.temperature);
+        float t = bme280_compensateTemperature(t_fine); // C
+        float p = bme280_compensatePressure(raw.pressure, &cal, t_fine) / 100; // hPa
+        float h = bme280_compensateHumidity(raw.humidity, &cal, t_fine);       // %
+        float a = bme280_getAltitude(p);                         // meters
+
+        if (t > 0 && t < 100) {
+            humidity = h;
+            temperature = t * 9 / 5 + 32;
+        }
+
+        printf("t=%f  temperature=%f\n", t,temperature);
+
+		delay(1000);
 	}
 }
 
@@ -196,11 +198,9 @@ void updateClock() {
 
 
 
-	lcdPosition(lcdHandle, 0, 0);           //Position cursor on the first line in the first column
 	if (strlen(vtime) > 16) {
 		vtime[16] = 0;
 	}
-	lcdPuts(lcdHandle, vtime);  //Print the text on the LCD at the current cursor postion
 
 	if (!daemonMode) {
 		printf("%s\n", vtime);
@@ -209,7 +209,6 @@ void updateClock() {
 	piLock(0);
 
 	if (temperature > -999) {
-		lcdPosition(lcdHandle, 0, 1);
 		char humi[32];
 		char temp[32];
 		char tmpstr1[1024];
@@ -230,7 +229,7 @@ void updateClock() {
 			}
 			tmpstr2[marquee + lcdWidth] = 0;
 
-			lcdPuts(lcdHandle, &tmpstr2[marquee++]);
+//			lcdPuts(lcdHandle, &tmpstr2[marquee++]);
 
 			if (marquee > strlen(tmpstr1) - 1) {
 				marquee = 0;
@@ -243,7 +242,7 @@ void updateClock() {
 			}
 			tmpstr2[marquee + lcdWidth] = 0;
 
-			lcdPuts(lcdHandle, &tmpstr2[marquee++]);
+			//lcdPuts(lcdHandle, &tmpstr2[marquee++]);
 
 			if (marquee > strlen(tmpstr1) - 1) {
 				marquee = 0;
@@ -251,7 +250,7 @@ void updateClock() {
 		} else {
 
 
-			lcdPrintf(lcdHandle, "%-8.8s%8.8s", humi, temp);
+			//lcdPrintf(lcdHandle, "%-8.8s%8.8s", humi, temp);
 			if (!daemonMode) {
 				printf("%-8.8s %-8.8s", humi, temp);
 			}
@@ -281,22 +280,29 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-    printf("clock address 0x%02x; dht22pin=%d\n", lcdAddress, dhtPin);
+    printf("bme280_address=%02x\n", bme280_address);
 
-	threadCreate(readDHT22Loop, "read dht sensor");
+	threadCreate(readBME280Loop, "read bme280 sensor");
 	printf("updating clock... speed=%dms\n", marqueeSpeed);
+
+    int tries = 5;
+    while (temperature < -999 && tries--) {
+        delay(1000);
+    }
+
+    if (temperature < -999) {
+        printf("cannot read bme280\n");
+        return 9;
+    }
+
 
 	if (daemonMode) {
 		threadCreate(updateClockLoop, "update clock loop");
 		while (true) {
 			delay(4294967295U);   // 3.27 years
 		}
-	}
-	else {
-		while (temperature < 999 && tries--) {
-			delay(1000);
-		}
-		updateClock();
+	} else {
+        updateClock();
 	}
 
 
