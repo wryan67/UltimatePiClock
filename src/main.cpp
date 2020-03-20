@@ -26,8 +26,22 @@
 #include "./tools/include/threads.h"
 #include "./tools/include/pcf8574io.h"
 
+// Display vars
+using namespace udd;
 
- // Global Variables
+DisplayConfigruation d1Config;
+
+DisplayST7789R d1 = DisplayST7789R();
+
+
+// bme280 info
+int bme280_address = 0x76;
+bme280_calib_data cal;
+int bme280_fd;
+
+
+
+// Global Variables
 static char         dateFormat = '1';
 static volatile int marqueeSpeed = 400;
 
@@ -36,10 +50,6 @@ static volatile float humidity = -9999;
 static volatile float temperature = -9999;
 int marquee = 0;
 
-// bme280 info
-int bme280_address = 0x76;
-bme280_calib_data cal;
-int bme280_fd;
 
 
 
@@ -62,6 +72,19 @@ bool usage() {
 }
 
 
+void configureDisplay1() {
+    d1Config.width = 240;
+    d1Config.height = 320;
+    d1Config.spiSpeed = 90000000;
+
+    d1Config.CS = 21;
+    d1Config.DC = 22;
+    d1Config.RST = 23;
+    d1Config.BLK = 7;
+
+    d1.openDisplay(d1Config);
+    d1.printConfiguration();
+}
 
 
 bool setup() {
@@ -82,9 +105,11 @@ bool setup() {
 
     bme280_fd=bme280_standardSetup(bme280_address, &cal);
 
+    configureDisplay1();
 
 	return true;
 }
+
 
 
 bool commandLineOptions(int argc, char **argv) {
@@ -136,20 +161,6 @@ bool commandLineOptions(int argc, char **argv) {
 }
 
 
-static uint8_t sizecvt(const int read)
-{
-	/* digitalRead() and friends from wiringpi are defined as returning a value
-	< 256. However, they are returned as int() types. This is a safety function */
-
-	if (read > 255 || read < 0)
-	{
-		printf("Invalid data from wiringPi library\n");
-		exit(EXIT_FAILURE);
-	}
-	return (uint8_t)read;
-}
-
-
 
 
 void *readBME280Loop(void *) {
@@ -171,31 +182,33 @@ void *readBME280Loop(void *) {
             temperature = t * 9 / 5 + 32;
         }
 
-        printf("t=%f  temperature=%f\n", t,temperature);
+//        printf("temperature=%f humidity=%f\n", temperature,humidity);
 
 		delay(1000);
 	}
 }
 
-void updateClock() {
-	auto now = std::chrono::system_clock::now();
-	std::time_t end_time = std::chrono::system_clock::to_time_t(now);
-	char vtime[64];
+void updateClock(Image *image) {
 
-	switch (dateFormat) {
-	case '2':	std::strftime(vtime, 64, "%a %e  %I:%M %p", std::localtime(&end_time));
-		break;
-	default:
-		if (std::localtime(&end_time)->tm_mday < 10) {
-			char xtime[64];
-			std::strftime(xtime, 64, "%a %b %%d  %H:%M", std::localtime(&end_time));
-			sprintf(vtime, xtime, std::localtime(&end_time)->tm_mday);
-		}
-		else {
-			std::strftime(vtime, 64, "%a %b %e %H:%M", std::localtime(&end_time));
-		}
-	}
+    auto now = std::chrono::system_clock::now();
+    std::time_t end_time = std::chrono::system_clock::to_time_t(now);
+    char vtime[64];
 
+    int saveMarquee;
+
+    switch (dateFormat) {
+    case '2':	std::strftime(vtime, 64, "%a %e  %I:%M %p", std::localtime(&end_time));
+        break;
+    default:
+        if (std::localtime(&end_time)->tm_mday < 10) {
+            char xtime[64];
+            std::strftime(xtime, 64, "%a %b %%d  %H:%M", std::localtime(&end_time));
+            sprintf(vtime, xtime, std::localtime(&end_time)->tm_mday);
+        }
+        else {
+            std::strftime(vtime, 64, "%a %b %e %H:%M", std::localtime(&end_time));
+        }
+    }
 
 
 	if (strlen(vtime) > 16) {
@@ -206,63 +219,110 @@ void updateClock() {
 		printf("%s\n", vtime);
 	}
 
-	piLock(0);
+    char humi[32];
+    char temp[32];
+    char tmpstr1[1024];
+    char tmpstr2[2048];
 
-	if (temperature > -999) {
-		char humi[32];
-		char temp[32];
-		char tmpstr1[1024];
-		char tmpstr2[2048];
-		sprintf(humi, "H:%.0f%%", humidity);
-		sprintf(temp, "T:%.0f%cF", temperature, 0xdf);
+    if (temperature > -999) {
+        sprintf(humi, "H:%.0f%%", humidity);
+        sprintf(temp, "T:%.0ff", temperature);
 
-		int maxMessageLength = lcdWidth - 4;
+        int maxMessageLength = lcdWidth - 4;
 
-		if (strlen(msg) > 0 && strlen(msg)<=maxMessageLength) {
+        memset(tmpstr1, 0, sizeof(tmpstr1));
 
-			sprintf(tmpstr2, "%*s", lcdWidth, "");
-			sprintf(&tmpstr2[(lcdWidth - strlen(msg)) / 2], "%s", msg);
-			sprintf(tmpstr1, "%-6.6s  %-6.6s  %-*.*s", humi, temp, lcdWidth, lcdWidth, tmpstr2);
-			sprintf(tmpstr2, "%s  %s  ", tmpstr1, tmpstr1);
-			if (!daemonMode) {
-				printf("%s\n", tmpstr1);
-			}
-			tmpstr2[marquee + lcdWidth] = 0;
+        if (strlen(msg) > 0 && strlen(msg) <= maxMessageLength) {
 
-//			lcdPuts(lcdHandle, &tmpstr2[marquee++]);
+            sprintf(tmpstr2, "%*s", lcdWidth, "");
+            sprintf(&tmpstr2[(lcdWidth - strlen(msg)) / 2], "%s", msg);
+            sprintf(tmpstr1, "%-6.6s  %-6.6s  %-*.*s", humi, temp, lcdWidth, lcdWidth, tmpstr2);
+            sprintf(tmpstr2, "%s  %s  ", tmpstr1, tmpstr1);
+            if (!daemonMode) {
+                printf("%s\n", tmpstr1);
+            }
+            tmpstr2[marquee + lcdWidth] = 0;
 
-			if (marquee > strlen(tmpstr1) - 1) {
-				marquee = 0;
-			}
-		} else if (strlen(msg) > 0) {
-			sprintf(tmpstr1, "%-6.6s  %-6.6s  %s", humi, temp, msg);
-			sprintf(tmpstr2, "%s  %s  ", tmpstr1, tmpstr1);
-			if (!daemonMode) {
-				printf("%s\n", tmpstr1);
-			}
-			tmpstr2[marquee + lcdWidth] = 0;
+            saveMarquee = marquee++;
+            //			lcdPuts(lcdHandle, &tmpstr2[marquee++]);
 
-			//lcdPuts(lcdHandle, &tmpstr2[marquee++]);
+            if (marquee > strlen(tmpstr1) + 1) {
+                marquee = 0;
+            }
+        }
+        else if (strlen(msg) > 0) {
+            sprintf(tmpstr1, "%-6.6s  %-6.6s  %s  ", humi, temp, msg);
+            sprintf(tmpstr2, "%s  %s  ", tmpstr1, tmpstr1);
+            if (!daemonMode) {
+                printf("%s\n", tmpstr1);
+            }
+            tmpstr2[marquee + lcdWidth] = 0;
 
-			if (marquee > strlen(tmpstr1) - 1) {
-				marquee = 0;
-			}
-		} else {
+            saveMarquee = marquee++;
+            //lcdPuts(lcdHandle, &tmpstr2[marquee++]);
+            if (marquee > strlen(tmpstr1) + 1) {
+                marquee = 0;
+            }
+        }
+        else {
 
 
-			//lcdPrintf(lcdHandle, "%-8.8s%8.8s", humi, temp);
-			if (!daemonMode) {
-				printf("%-8.8s %-8.8s", humi, temp);
-			}
-		}
-	}
+            //lcdPrintf(lcdHandle, "%-8.8s%8.8s", humi, temp);
+            if (!daemonMode) {
+                printf("%-8.8s %-8.8s", humi, temp);
+            }
+        }
 
-	piUnlock(0);
+
+
+
+        image->clear(BLACK);
+        image->loadBMP("images/BlueAngle4-320x240.bmp", 0, 0);
+
+
+        int imageWidth = d1Config.height;
+        int imageHeight = d1Config.width;
+        int minX = 0, minY = 0;
+        int maxX = imageWidth - 1;
+        int maxY = imageHeight - 1;
+        int midY = minY + (maxY - minY) / 2;
+        int midX = minX + (maxX - minX) / 2;
+
+        char message[64];
+
+
+        strcpy(message, vtime);
+
+        int charHeight = 23;
+        int charWidth = 17;
+
+        int startText = midX - (8 * charWidth);
+
+        image->drawLine(startText + (16 * charWidth), minY, startText + (16 * charWidth), minY + charHeight, WHITE, SOLID, 1);
+        image->drawLine(startText - 1, minY, startText - 1, minY + charHeight, WHITE, SOLID, 1);
+        image->drawLine(startText - 1, minY + charHeight + 1, startText + (16 * charWidth), minY + charHeight + 1, WHITE, SOLID, 1);
+        image->drawText(startText, minY, message, &Font24, DARK_GRAY_BLUE, WHITE);
+
+        memset(message, 0, sizeof(message));
+            strcpy(message, &tmpstr2[saveMarquee]);
+        //sprintf(message, "%-8.8s %-8.8s", humi, temp);
+//        strcpy(message, "hello");
+
+        //printf("%s||%s - %d %d \n", tmpstr1, message, strlen(tmpstr1), saveMarquee);
+        image->drawText(startText, maxY - charHeight, message, &Font24, DARK_GRAY_BLUE, WHITE);
+
+
+        d1.showImage(*image, DEGREE_270);
+
+
+    }
 }
 
 void *updateClockLoop(void *) {
+    Image img = Image(320, 240, BLACK);
+
 	while (true) {
-		updateClock();
+		updateClock(&img);
 		delay(marqueeSpeed);
 	}
 }
@@ -279,6 +339,7 @@ int main(int argc, char **argv)
 		printf("setup failed\n");
 		return 1;
 	}
+    d1.clear(BLACK);
 
     printf("bme280_address=%02x\n", bme280_address);
 
@@ -302,7 +363,8 @@ int main(int argc, char **argv)
 			delay(4294967295U);   // 3.27 years
 		}
 	} else {
-        updateClock();
+        Image img = Image(320, 240, BLACK);
+        updateClock(&img);
 	}
 
 
