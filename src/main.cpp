@@ -42,6 +42,7 @@ int bme280_fd;
 
 
 // Global Variables
+static long         spiSpeed = 90000000;
 static char         dateFormat = '1';
 static volatile int marqueeSpeed = 400;
 
@@ -61,7 +62,8 @@ char msg[1024];
 bool usage() {
 	fprintf(stderr, "usage: lcdClock [-d] [-b 00-FF] [-p 0-40] [-f n] [-s speed] [-m motd]\n");
 	fprintf(stderr, "d = daemon mode\n");
-	fprintf(stderr, "b = bme280 address (hex)\n");
+    fprintf(stderr, "i = spi speed (default=90000000)\n");
+    fprintf(stderr, "b = bme280 address (hex)\n");
 	fprintf(stderr, "m = message of the day, max %d characters\n", maxMessageSize);
 	fprintf(stderr, "s = marquee speed (ms)\n");
 	fprintf(stderr, "f = clock format\n");
@@ -75,7 +77,7 @@ bool usage() {
 void configureDisplay1() {
     d1Config.width = 240;
     d1Config.height = 320;
-    d1Config.spiSpeed = 90000000;
+    d1Config.spiSpeed = spiSpeed;
 
     d1Config.CS = 21;
     d1Config.DC = 22;
@@ -119,7 +121,7 @@ bool commandLineOptions(int argc, char **argv) {
 		return usage();
 	}
 
-	while ((c = getopt(argc, argv, "db:f:m:s:")) != -1)
+	while ((c = getopt(argc, argv, "db:f:i:m:s:")) != -1)
 		switch (c) {
 		case 'd':
 			daemonMode = true;
@@ -134,7 +136,10 @@ bool commandLineOptions(int argc, char **argv) {
 		case 'b':
 			sscanf(optarg, "%x", &bme280_address);
 			break;
-		case 's':
+        case 'i':
+            sscanf(optarg, "%ld", &spiSpeed);
+            break;
+        case 's':
 			sscanf(optarg, "%d", &marqueeSpeed);
 			break;
 		case 'f':
