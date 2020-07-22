@@ -66,15 +66,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\tools\util\dht22.cpp" />
-    <ClCompile Include="src\tools\util\lcd.cpp" />
     <ClCompile Include="src\tools\util\stringUtil.cpp" />
     <ClCompile Include="src\tools\util\threads.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\tools\include\dht22.h" />
-    <ClInclude Include="src\tools\include\lcd.h" />
-    <ClInclude Include="src\tools\include\pcf8574io.h" />
     <ClInclude Include="src\tools\include\stringUtil.h" />
     <ClInclude Include="src\tools\include\threads.h" />
   </ItemGroup>

@@ -4,8 +4,6 @@
  * Compiling :gcc -Wall name.c -lwiringPi -lwiringPiDev
  */
 #include <wiringPi.h>
-#include <pcf8574.h>
-#include <lcd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -24,9 +22,13 @@
 #include <bme280rpi.h>
 
 #include "./tools/include/threads.h"
-#include "./tools/include/pcf8574io.h"
 
-// Display vars
+int marquee = 0;
+int innerStep = 16;
+int marqueeSpeed = 100;
+
+ 
+ // Display vars
 using namespace udd;
 
 DisplayConfigruation d1Config;
@@ -44,17 +46,14 @@ int bme280_fd;
 // Global Variables
 static long         spiSpeed = 90000000;
 static char         dateFormat = '1';
-static volatile int marqueeSpeed = 400;
 
 static volatile bool daemonMode = false;
 static volatile float humidity = -9999;
 static volatile float temperature = -9999;
-int marquee = 0;
 
 
 
-
-#define lcdWidth 16
+#define marqueeVisableChars 16
 #define maxMessageSize 128
 char msg[1024];
 
@@ -193,13 +192,22 @@ void *readBME280Loop(void *) {
 	}
 }
 
+void imageCopy(Image& destinationImage, int destinationX, int destinationY, Image& sourceImage, int sourceX, int sourceY, int windowWidth, int windowHeight) {
+
+    for (int x = 0; x < windowWidth; ++x) {
+        for (int y = 0; y < windowHeight; ++y) {
+            ColorType* clr = sourceImage.getPixel(x + sourceX, y + sourceY, DEGREE_0);
+            destinationImage.drawPixel(x + destinationX, y + destinationY, Color(*clr));
+        }
+    }
+}
+
+
 void updateClock(Image *image) {
 
     auto now = std::chrono::system_clock::now();
     std::time_t end_time = std::chrono::system_clock::to_time_t(now);
     char vtime[64];
-
-    int saveMarquee;
 
     switch (dateFormat) {
     case '2':	std::strftime(vtime, 64, "%a %e  %I:%M %p", std::localtime(&end_time));
@@ -215,9 +223,8 @@ void updateClock(Image *image) {
         }
     }
 
-
-	if (strlen(vtime) > 16) {
-		vtime[16] = 0;
+	if (strlen(vtime) > marqueeVisableChars) {
+		vtime[marqueeVisableChars] = 0;
 	}
 
 	if (!daemonMode) {
@@ -233,53 +240,25 @@ void updateClock(Image *image) {
         sprintf(humi, "H:%.0f%%", humidity);
         sprintf(temp, "T:%.0ff", temperature);
 
-        int maxMessageLength = lcdWidth - 4;
-
         memset(tmpstr1, 0, sizeof(tmpstr1));
 
-        if (strlen(msg) > 0 && strlen(msg) <= maxMessageLength) {
+        sprintf(tmpstr2, "%*s", marqueeVisableChars, "");
 
-            sprintf(tmpstr2, "%*s", lcdWidth, "");
-            sprintf(&tmpstr2[(lcdWidth - strlen(msg)) / 2], "%s", msg);
-            sprintf(tmpstr1, "%-6.6s  %-6.6s  %-*.*s", humi, temp, lcdWidth, lcdWidth, tmpstr2);
-            sprintf(tmpstr2, "%s  %s  ", tmpstr1, tmpstr1);
-            if (!daemonMode) {
-                printf("%s\n", tmpstr1);
-            }
-            tmpstr2[marquee + lcdWidth] = 0;
-
-            saveMarquee = marquee++;
-            //			lcdPuts(lcdHandle, &tmpstr2[marquee++]);
-
-            if (marquee > strlen(tmpstr1) + 1) {
-                marquee = 0;
-            }
-        }
-        else if (strlen(msg) > 0) {
-            sprintf(tmpstr1, "%-6.6s  %-6.6s  %s  ", humi, temp, msg);
-            sprintf(tmpstr2, "%s  %s  ", tmpstr1, tmpstr1);
-            if (!daemonMode) {
-                printf("%s\n", tmpstr1);
-            }
-            tmpstr2[marquee + lcdWidth] = 0;
-
-            saveMarquee = marquee++;
-            //lcdPuts(lcdHandle, &tmpstr2[marquee++]);
-            if (marquee > strlen(tmpstr1) + 1) {
-                marquee = 0;
-            }
-        }
-        else {
-
-
-            //lcdPrintf(lcdHandle, "%-8.8s%8.8s", humi, temp);
-            if (!daemonMode) {
-                printf("%-8.8s %-8.8s", humi, temp);
-            }
+        if (strlen(msg) < 1) {
+            marquee = -1;
+            memset(tmpstr2, 0, sizeof(tmpstr2));
+        }  else if (strlen(msg) < (marqueeVisableChars - 4)) {
+            strcpy(&tmpstr2[(marqueeVisableChars - strlen(msg)) / 2], msg);
+        } else {
+            strcpy(tmpstr2, msg);
         }
 
+        sprintf(tmpstr1, "%-6.6s  %-6.6s  %-*.*s", humi, temp, marqueeVisableChars, marqueeVisableChars, tmpstr2);
+        sprintf(tmpstr2, "%s  %s  ", tmpstr1, tmpstr1);
 
-
+        if (!daemonMode) {
+            printf("%s\n", tmpstr1);
+        }
 
         image->clear(BLACK);
         image->loadBMP("images/BlueAngle4-320x240.bmp", 0, 0);
@@ -293,32 +272,56 @@ void updateClock(Image *image) {
         int midY = minY + (maxY - minY) / 2;
         int midX = minX + (maxX - minX) / 2;
 
-        char message[64];
-
-
+        char message[128];
         strcpy(message, vtime);
 
         int charHeight = 23;
         int charWidth = 17;
 
-        int startText = midX - (8 * charWidth);
+        int startText = midX - ((marqueeVisableChars/2) * charWidth);
 
-        image->drawLine(startText + (16 * charWidth), minY, startText + (16 * charWidth), minY + charHeight, WHITE, SOLID, 1);
-        image->drawLine(startText - 1, minY, startText - 1, minY + charHeight, WHITE, SOLID, 1);
-        image->drawLine(startText - 1, minY + charHeight + 1, startText + (16 * charWidth), minY + charHeight + 1, WHITE, SOLID, 1);
+        // top text
         image->drawText(startText, minY, message, &Font24, DARK_GRAY_BLUE, WHITE);
 
-        memset(message, 0, sizeof(message));
-            strcpy(message, &tmpstr2[saveMarquee]);
-        //sprintf(message, "%-8.8s %-8.8s", humi, temp);
-//        strcpy(message, "hello");
+        // top - right ling
+        image->drawLine(startText + (marqueeVisableChars * charWidth), minY, startText + (marqueeVisableChars * charWidth), minY + charHeight, DARK_GRAY_BLUE, SOLID, 1);
+        image->drawLine(startText + (marqueeVisableChars * charWidth) + 1, minY, startText + (marqueeVisableChars * charWidth) + 1, minY + charHeight, WHITE, SOLID, 1);
 
-        //printf("%s||%s - %d %d \n", tmpstr1, message, strlen(tmpstr1), saveMarquee);
-        image->drawText(startText, maxY - charHeight, message, &Font24, DARK_GRAY_BLUE, WHITE);
+        // top - left line
+        image->drawLine(startText - 1, minY, startText - 1, minY + charHeight, DARK_GRAY_BLUE, SOLID, 1);
+        image->drawLine(startText - 2, minY, startText - 2, minY + charHeight, WHITE, SOLID, 1);
+
+        // top - bottom line
+        image->drawLine(startText - 1, minY + charHeight + 0, startText + (marqueeVisableChars * charWidth), minY + charHeight + 0, WHITE, SOLID, 1);
+
+
+        // bottom text
+        Image tmpimg = Image(charWidth * (strlen(tmpstr2)+2), charHeight*2, BLACK);
+
+        tmpimg.drawText(0, 0, tmpstr2, &Font24, DARK_GRAY_BLUE, WHITE);
+
+        int windowWidth = marqueeVisableChars * charWidth;
+
+        ++marquee;
+
+        int messageWidth = (strlen(tmpstr1) + 2) * charWidth;
+
+        imageCopy(*image, startText, maxY - charHeight + 1,
+            tmpimg, marquee % (messageWidth), 0,
+            windowWidth, charHeight);
+
+        // bottom - bottom line
+        image->drawLine(startText - 1, maxY - charHeight, startText + (marqueeVisableChars * charWidth), maxY - charHeight, WHITE, SOLID, 1);
+
+        // bottom - right ling
+        image->drawLine(startText + (marqueeVisableChars * charWidth) + 1, maxY-charHeight, startText + (marqueeVisableChars * charWidth) + 1, maxY, WHITE, SOLID, 1);
+
+        // bottom - left line
+        image->drawLine(startText - 2, maxY-charHeight, startText - 2, maxY, WHITE, SOLID, 1);
+
 
 
         d1.showImage(*image, DEGREE_270);
-
 
     }
 }
@@ -328,7 +331,7 @@ void *updateClockLoop(void *) {
 
 	while (true) {
 		updateClock(&img);
-		delay(marqueeSpeed);
+		usleep(marqueeSpeed);
 	}
 }
 
