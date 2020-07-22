@@ -27,6 +27,7 @@ int marquee = 0;
 int innerStep = 16;
 int marqueeSpeed = 100;
 
+char* pictureFilename;
  
  // Display vars
 using namespace udd;
@@ -66,6 +67,7 @@ bool usage() {
 	fprintf(stderr, "m = message of the day, max %d characters\n", maxMessageSize);
 	fprintf(stderr, "s = marquee speed (ms)\n");
 	fprintf(stderr, "f = clock format\n");
+    fprintf(stderr, "p = picture filename\n");
 	fprintf(stderr, "    1 - Weekday Month Date HH24:SS\n");
 	fprintf(stderr, "    2 - Weekday Date  HH:SS AM/PM\n");
 
@@ -120,7 +122,7 @@ bool commandLineOptions(int argc, char **argv) {
 		return usage();
 	}
 
-	while ((c = getopt(argc, argv, "db:f:i:m:s:")) != -1)
+	while ((c = getopt(argc, argv, "db:f:i:m:p:s:")) != -1)
 		switch (c) {
 		case 'd':
 			daemonMode = true;
@@ -144,7 +146,10 @@ bool commandLineOptions(int argc, char **argv) {
 		case 'f':
 			dateFormat = optarg[0];
 			break;
-		case '?':
+        case 'p':
+            pictureFilename = optarg;
+            break;
+        case '?':
 			if (optopt == 'a' || optopt == 'p' || optopt == 'f' || optopt == 'm' || optopt == 's')
 				fprintf(stderr, "Option -%c requires an argument.\n", optopt);
 			else if (isprint(optopt))
@@ -261,7 +266,7 @@ void updateClock(Image *image) {
         }
 
         image->clear(BLACK);
-        image->loadBMP("images/BlueAngle4-320x240.bmp", 0, 0);
+        image->loadBMP(pictureFilename, 0, 0);
 
 
         int imageWidth = d1Config.height;
@@ -319,7 +324,7 @@ void updateClock(Image *image) {
         // bottom - left line
         image->drawLine(startText - 2, maxY-charHeight, startText - 2, maxY, WHITE, SOLID, 1);
 
-
+        tmpimg.close();
 
         d1.showImage(*image, DEGREE_270);
 
@@ -331,7 +336,7 @@ void *updateClockLoop(void *) {
 
 	while (true) {
 		updateClock(&img);
-		usleep(marqueeSpeed);
+//		usleep(marqueeSpeed);
 	}
 }
 
