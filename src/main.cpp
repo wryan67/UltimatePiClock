@@ -28,7 +28,7 @@ int marquee = 0;
 int innerStep = 16;
 int marqueeSpeed = 100;
 
-char* pictureFolderName;
+char* pictureFolderName = "~/Pictures/clock";
  
  // Display vars
 using namespace udd;
@@ -346,25 +346,36 @@ using namespace std;
 vector<char *> pictureFiles;
 
 void updateFileList() {
-    DIR* dir;
-    struct dirent* ent;
+    char tmpstr[PATH_MAX+1024];
 
+    for (char* s : pictureFiles) {
+        free(s);
+    }
     pictureFiles.clear();
-    if ((dir = opendir(pictureFolderName)) != NULL) {
-        while ((ent = readdir(dir)) != NULL) {
-            char* filename = ent->d_name;
-            printf("%s\n", filename);
-            if (strcmp(".", filename)&&strcmp("..",filename)) {
-                pictureFiles.push_back(ent->d_name);
-            }
-        }
-        closedir(dir);
-    } else {
-        /* could not open directory */
-        fprintf(stderr, "could not open picture folder: %s\n", pictureFolderName);
+
+    printf("tag00\n"); fflush(stdout);
+    sprintf(tmpstr, "find %s -type f -exec file {} \\; | sed -ne 's/^\\(.*\\): PC bitmap.*/\\1/p' -e 's/\\(.*\\): [[:alnum:]]* image.*/\\1/p'", pictureFolderName);
+    FILE* listing = popen(tmpstr, "r");
+    
+    if (listing == NULL) {
+        fprintf(stderr, "could not open %s folder\b ", pictureFolderName); fflush(stderr);
         exit(EXIT_FAILURE);
     }
 
+    while (fgets(tmpstr, PATH_MAX, listing) != NULL) {
+        char* path = (char*)malloc(strlen(tmpstr) + 8);
+        strcpy(path, tmpstr);
+        if (path[strlen(path) - 1] == 10) {
+            path[strlen(path) - 1] = 0;
+        }
+        pictureFiles.push_back(path);
+        printf("path=%s\n", path); fflush(stdout);
+    }
+    if (pictureFiles.size() < 1) {
+        fprintf(stderr, "no images found in %s folder\n", pictureFolderName); fflush(stderr);
+        exit(EXIT_FAILURE);
+    }
+ 
 }
 
 int random(int low, int high) {
@@ -377,7 +388,7 @@ void loadImage(Image& image) {
     char tmpstr[512];
     updateFileList();
 
-    sprintf(tmpstr, "%s/%s", pictureFolderName, pictureFiles[random(0, pictureFiles.size() - 1)]);
+    sprintf(tmpstr, "%s", pictureFiles[random(0, pictureFiles.size() - 1)]);
     image.loadBMP(tmpstr, 0, 0);
 }
 
