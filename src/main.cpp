@@ -13,10 +13,11 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/types.h>
+#include <sys/time.h>
+#include <dirent.h>
 
 #include <chrono>
 #include <ctime>  
-
 
 #include <udd.h>
 #include <bme280rpi.h>
@@ -27,7 +28,7 @@ int marquee = 0;
 int innerStep = 16;
 int marqueeSpeed = 100;
 
-char* pictureFilename;
+char* pictureFolderName;
  
  // Display vars
 using namespace udd;
@@ -36,6 +37,9 @@ DisplayConfigruation d1Config;
 
 DisplayST7789R d1 = DisplayST7789R();
 
+#ifndef NULL
+#define NULL 0
+#endif
 
 // bme280 info
 int bme280_address = 0x76;
@@ -57,6 +61,14 @@ static volatile float temperature = -9999;
 #define marqueeVisableChars 16
 #define maxMessageSize 128
 char msg[1024];
+unsigned long long currentTimeMillis() {
+    struct timeval currentTime;
+    gettimeofday(&currentTime, NULL);
+
+    return
+        (unsigned long long)(currentTime.tv_sec) * 1000 +
+        (unsigned long long)(currentTime.tv_usec) / 1000;
+}
 
 
 bool usage() {
@@ -147,7 +159,7 @@ bool commandLineOptions(int argc, char **argv) {
 			dateFormat = optarg[0];
 			break;
         case 'p':
-            pictureFilename = optarg;
+            pictureFolderName = optarg;
             break;
         case '?':
 			if (optopt == 'a' || optopt == 'p' || optopt == 'f' || optopt == 'm' || optopt == 's')
@@ -265,8 +277,6 @@ void updateClock(Image *image) {
             printf("%s\n", tmpstr1);
         }
 
-        image->clear(BLACK);
-        image->loadBMP(pictureFilename, 0, 0);
 
 
         int imageWidth = d1Config.height;
@@ -331,12 +341,62 @@ void updateClock(Image *image) {
     }
 }
 
-void *updateClockLoop(void *) {
-    Image img = Image(320, 240, BLACK);
+#include <vector>
+using namespace std;
+vector<char *> pictureFiles;
 
+void updateFileList() {
+    DIR* dir;
+    struct dirent* ent;
+
+    pictureFiles.clear();
+    if ((dir = opendir(pictureFolderName)) != NULL) {
+        while ((ent = readdir(dir)) != NULL) {
+            char* filename = ent->d_name;
+            printf("%s\n", filename);
+            if (strcmp(".", filename)&&strcmp("..",filename)) {
+                pictureFiles.push_back(ent->d_name);
+            }
+        }
+        closedir(dir);
+    } else {
+        /* could not open directory */
+        fprintf(stderr, "could not open picture folder: %s\n", pictureFolderName);
+        exit(EXIT_FAILURE);
+    }
+
+}
+
+int random(int low, int high) {
+    double r = (double)rand() / RAND_MAX;
+
+    return low + (r * (1 + high - low));
+}
+
+void loadImage(Image& image) {
+    char tmpstr[512];
+    updateFileList();
+
+    sprintf(tmpstr, "%s/%s", pictureFolderName, pictureFiles[random(0, pictureFiles.size() - 1)]);
+    image.loadBMP(tmpstr, 0, 0);
+}
+
+void *updateClockLoop(void *) {
+    Image image = Image(320, 240, BLACK);
+    image.clear(BLACK);
+
+    loadImage(image);
+    
+    long long start = currentTimeMillis();
 	while (true) {
-		updateClock(&img);
-//		usleep(marqueeSpeed);
+		updateClock(&image);
+        long long now = currentTimeMillis();
+        long long elapsed = now - start;
+        if (elapsed > 30 * 1000) {
+            loadImage(image);
+            start = now;
+        }
+        //		usleep(marqueeSpeed);
 	}
 }
 
