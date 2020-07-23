@@ -30,6 +30,10 @@ int marqueeSpeed = 100;
 
 char* pictureFolderName = "~/Pictures/clock";
  
+enum ProcessLocks {
+    IMAGE_LOCK
+};
+
  // Display vars
 using namespace udd;
 
@@ -303,6 +307,8 @@ void updateClock(Image *image) {
 
         int startText = midX - ((marqueeVisableChars/2) * charWidth);
 
+        piLock(IMAGE_LOCK);
+
         // top text
         image->drawText(startText, minY, message, &Font24, DARK_GRAY_BLUE, WHITE);
 
@@ -345,6 +351,7 @@ void updateClock(Image *image) {
         tmpimg.close();
 
         d1.showImage(*image, DEGREE_270);
+        piUnlock(IMAGE_LOCK);
 
     }
 }
@@ -434,8 +441,9 @@ void loadImage(Image& image) {
     pipe(imagePipes);
     threadCreate(pushBuffer, "pushBuffer");
 
-    image.clear(BLACK);
+    piLock(IMAGE_LOCK);
     image.loadBMP(fdopen(imagePipes[0],"r"), 0, 0);
+    piUnlock(IMAGE_LOCK);
     close(imagePipes[0]);
     free(imageBuffer);
     // loadBMP closes the pipe
