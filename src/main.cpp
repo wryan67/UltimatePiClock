@@ -353,7 +353,6 @@ void updateFileList() {
     }
     pictureFiles.clear();
 
-    printf("tag00\n"); fflush(stdout);
     sprintf(tmpstr, "find %s -type f -exec file {} \\; | sed -ne 's/^\\(.*\\): PC bitmap.*/\\1/p' -e 's/\\(.*\\): [[:alnum:]]* image.*/\\1/p'", pictureFolderName);
     FILE* listing = popen(tmpstr, "r");
     
@@ -369,13 +368,12 @@ void updateFileList() {
             path[strlen(path) - 1] = 0;
         }
         pictureFiles.push_back(path);
-        printf("path=%s\n", path); fflush(stdout);
     }
+
     if (pictureFiles.size() < 1) {
         fprintf(stderr, "no images found in %s folder\n", pictureFolderName); fflush(stderr);
         exit(EXIT_FAILURE);
     }
- 
 }
 
 int random(int low, int high) {
@@ -385,11 +383,29 @@ int random(int low, int high) {
 }
 
 void loadImage(Image& image) {
-    char tmpstr[512];
+    char tmpstr[8192];
     updateFileList();
 
-    sprintf(tmpstr, "%s", pictureFiles[random(0, pictureFiles.size() - 1)]);
-    image.loadBMP(tmpstr, 0, 0);
+    char screenSize[64];
+    sprintf(screenSize, "%dx%d", d1.config.height, d1.config.width);
+    fprintf(stderr, "screenSize=%s\n", screenSize); fflush(stderr);
+
+    sprintf(tmpstr, "convert %s -resize %s -background black -gravity center -extent %s -format bmp bmp:-",
+        pictureFiles[random(0,pictureFiles.size()-1)], screenSize, screenSize);
+
+    fprintf(stderr, "conversion cmd: %s\n", tmpstr); fflush(stderr);
+    system(tmpstr);
+
+    FILE* pipe = popen(tmpstr, "r");
+
+    if (pipe == NULL) {
+        fprintf(stderr, "conversion pipe did not open\n"); fflush(stderr);
+        exit(EXIT_FAILURE);
+    }
+    image.clear(BLACK);
+    image.loadBMP(pipe, 0, 0);
+
+    // loadBMP closes the pipe
 }
 
 void *updateClockLoop(void *) {
