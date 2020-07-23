@@ -61,6 +61,14 @@ static volatile float temperature = -9999;
 #define marqueeVisableChars 16
 #define maxMessageSize 128
 char msg[1024];
+
+Image clockImage = Image(320, 240, BLACK);
+char* imageBuffer;
+long  imageBufferSize;
+int   imagePipes[2];
+
+
+
 unsigned long long currentTimeMillis() {
     struct timeval currentTime;
     gettimeofday(&currentTime, NULL);
@@ -382,6 +390,12 @@ int random(int low, int high) {
     return low + (r * (1 + high - low));
 }
 
+
+void* pushBuffer(void *) {
+    write(imagePipes[1],imageBuffer, imageBufferSize);
+    close(imagePipes[1]);
+}
+
 void loadImage(Image& image) {
     char tmpstr[8192];
     updateFileList();
@@ -396,35 +410,60 @@ void loadImage(Image& image) {
     fprintf(stderr, "conversion cmd: %s\n", tmpstr); fflush(stderr);
     system(tmpstr);
 
-    FILE* pipe = popen(tmpstr, "r");
-
-    if (pipe == NULL) {
+    FILE* convertPipe = popen(tmpstr, "r");
+    if (convertPipe == NULL) {
         fprintf(stderr, "conversion pipe did not open\n"); fflush(stderr);
         exit(EXIT_FAILURE);
     }
-    image.clear(BLACK);
-    image.loadBMP(pipe, 0, 0);
 
+    imageBuffer = (char *) malloc(1024 * 1024);
+
+    long bytesRead = 0;
+    imageBufferSize = 0;
+
+    while (1) {
+        bytesRead = fread(&imageBuffer[imageBufferSize], 1, 1024 * 1024, convertPipe);
+        imageBufferSize += bytesRead;
+        if (bytesRead < 1024 * 1024) {
+            fclose(convertPipe);
+            break;
+        }
+        imageBuffer = (char *) realloc(imageBuffer, imageBufferSize + 1024 * 1024);
+    }
+        
+    pipe(imagePipes);
+    threadCreate(pushBuffer, "pushBuffer");
+
+    image.clear(BLACK);
+    image.loadBMP(fdopen(imagePipes[0],"r"), 0, 0);
+    close(imagePipes[0]);
+    free(imageBuffer);
     // loadBMP closes the pipe
 }
 
-void *updateClockLoop(void *) {
-    Image image = Image(320, 240, BLACK);
-    image.clear(BLACK);
 
-    loadImage(image);
-    
+
+void *updateImageLoop(void *) {
+    clockImage.clear(BLACK);
+
+    loadImage(clockImage);
+
     long long start = currentTimeMillis();
 	while (true) {
-		updateClock(&image);
         long long now = currentTimeMillis();
         long long elapsed = now - start;
         if (elapsed > 30 * 1000) {
-            loadImage(image);
+            loadImage(clockImage);
             start = now;
         }
-        //		usleep(marqueeSpeed);
 	}
+}
+
+void* updateClockLoop(void*) {
+
+    while (true) {
+        updateClock(&clockImage);
+    }
 }
 
 int main(int argc, char **argv)
@@ -459,7 +498,8 @@ int main(int argc, char **argv)
 
 	if (daemonMode) {
 		threadCreate(updateClockLoop, "update clock loop");
-		while (true) {
+        threadCreate(updateImageLoop, "update clock loop");
+        while (true) {
 			delay(4294967295U);   // 3.27 years
 		}
 	} else {
