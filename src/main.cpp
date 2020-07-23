@@ -399,40 +399,37 @@ int random(int low, int high) {
 
 
 void* pushBuffer(void *) {
-    write(imagePipes[1],imageBuffer, imageBufferSize);
+    write(imagePipes[1], imageBuffer, imageBufferSize);
     close(imagePipes[1]);
 }
 
 void loadImage(Image& image) {
     char tmpstr[8192];
+    char screenSize[64];
+    long bytesRead = 0;
+
     updateFileList();
 
-    char screenSize[64];
     sprintf(screenSize, "%dx%d", d1.config.height, d1.config.width);
-    fprintf(stderr, "screenSize=%s\n", screenSize); fflush(stderr);
+    sprintf(tmpstr,     "convert %s -resize %s -background black -gravity center -extent %s -format bmp bmp:-",
+                        pictureFiles[random(0,pictureFiles.size()-1)], screenSize, screenSize);
 
-    sprintf(tmpstr, "convert %s -resize %s -background black -gravity center -extent %s -format bmp bmp:-",
-        pictureFiles[random(0,pictureFiles.size()-1)], screenSize, screenSize);
+    fprintf(stderr, "imagemagick conversion cmd: %s\n", tmpstr); fflush(stderr);
 
-    fprintf(stderr, "conversion cmd: %s\n", tmpstr); fflush(stderr);
-    system(tmpstr);
-
-    FILE* convertPipe = popen(tmpstr, "r");
-    if (convertPipe == NULL) {
+    FILE* imageConversionPipe = popen(tmpstr, "r");
+    if (imageConversionPipe == NULL) {
         fprintf(stderr, "conversion pipe did not open\n"); fflush(stderr);
         exit(EXIT_FAILURE);
     }
 
     imageBuffer = (char *) malloc(1024 * 1024);
-
-    long bytesRead = 0;
     imageBufferSize = 0;
 
     while (1) {
-        bytesRead = fread(&imageBuffer[imageBufferSize], 1, 1024 * 1024, convertPipe);
+        bytesRead = fread(&imageBuffer[imageBufferSize], 1, 1024 * 1024, imageConversionPipe);
         imageBufferSize += bytesRead;
         if (bytesRead < 1024 * 1024) {
-            fclose(convertPipe);
+            fclose(imageConversionPipe);
             break;
         }
         imageBuffer = (char *) realloc(imageBuffer, imageBufferSize + 1024 * 1024);
