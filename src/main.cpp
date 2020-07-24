@@ -384,6 +384,7 @@ void updateFileList() {
         }
         pictureFiles.push_back(path);
     }
+    pclose(listing);
 
     if (pictureFiles.size() < 1) {
         fprintf(stderr, "no images found in %s folder\n", pictureFolderName); fflush(stderr);
