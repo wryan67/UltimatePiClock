@@ -9,15 +9,28 @@ This is the ultimate clock for your Raspberry Pi.  Features include:
 - The background changes every 30 seconds.  
 - Multiple image formats are supported via [ImageMagic](https://imagemagick.org/)
 - Scrolling marquee MOTD (message of the day)
-- TODO: Add alarms
+
+## TODO:
+- Add alarms
+- instructions for sharing your image folder to make copying your photos to the RPi easy.  For now, just SFTP them using WinSCP.
 
 ## Prerequisites
 
-Please follow the instructions on the bme280 library project folder:
+Please follow the instructions for these projects to install the respective libraries:
 
 - https://github.com/wryan67/bme280_rpi_lib
+- https://github.com/wryan67/udd_rpi_lib/blob/master/README.md  && the [[Wiki page]](https://github.com/wryan67/udd_rpi_lib/wiki)
 
+## Downloading
 
+Use git to download the software from github.com:
+
+    $ cd ~/projects { or wherever you keep downloads }
+    $ git clone https://github.com/wryan67/UltimatePiClock.git
+
+## Compiling
+
+    $ cd to 
 
 ## Demos
 
