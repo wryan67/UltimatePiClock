@@ -20,7 +20,7 @@ Please follow the instructions on the bme280 library project folder:
 
 ## Circuit Diagram
 
-![circuit diagram](https://github.com/wryan67/UltimatePiClock/blob/master/readme/circuit diagram.png?raw=true)
+![circuit diagram](https://github.com/wryan67/UltimatePiClock/blob/master/readme/circuit%20diagram.png?raw=true)
 
 ## Demos
 
