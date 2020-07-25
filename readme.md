@@ -9,6 +9,7 @@ This is the ultimate clock for your Raspberry Pi.  Features include:
 - The background changes every 30 seconds.  
 - Multiple image formats are supported via [ImageMagic](https://imagemagick.org/)
 - Scrolling marquee MOTD (message of the day)
+- The [ST7789](https://smile.amazon.com/gp/product/B081Q79X2F) seems to be a rugged and easy to use display, and it's what I'm using for the Demos.
 
 ## TODO:
 - Add alarms
