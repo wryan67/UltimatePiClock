@@ -45,7 +45,30 @@ Currently using Visual Studio Community Edition for development and compiling.
 
 Create this folder and put image files in the folder.  There's some demo images in the ~/projects/UltimatePiClock/imgages folder to get you started.
 
-    $ mkdir -p $HOME/Pictures/clock
+    $ mkdir -p /home/pi/Pictures/clock
+    $ cp /home/pi/projects/UltimatePiClock/images/BlueAngles* /home/pi/Pictures/clock/
+
+## Running
+
+    $ /home/pi/projects/piClock/bin/ARM/Debug/piClock.out -p /home/pi/Pictures/clock -i 66000000 -d -f2 -m 'Hello World!!!!!!'
+    Program initialization
+    displayId:         0
+    width:             240
+    height:            320
+    xOffset:           0
+    yOffset:           0
+    cs:                21
+    dc:                22
+    rst:               23
+    blk:               7
+    busy pin:          -1
+    spiChannel:        0
+    spiSpeed:          66000000
+    handle:            5
+    bme280_address=76
+    updating clock... speed=100ms
+    imagemagick conversion cmd: convert /home/pi/Pictures/clock/BlueAngles5.png -resize 320x240 -background black -gravity center -extent 320x240 -type truecolor bmp:-
+
 
 ## Demos
 
