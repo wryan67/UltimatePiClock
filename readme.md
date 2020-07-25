@@ -32,7 +32,7 @@ Use git to download the software from github.com:
 
 ## Compiling
 
-Currently using Visual Studio for development and compiling.
+Currently using Visual Studio Community Edition for development and compiling.
 
     1. Open the piClock.sln using Visual Studio 
     2. Setup your Remote Build Machine
