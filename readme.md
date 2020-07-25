@@ -13,6 +13,7 @@ This is the ultimate clock for your Raspberry Pi.  Features include:
 
 ## TODO:
 - Add alarms
+- Add support for true type fonts
 - instructions for sharing your image folder to make copying your photos to the RPi easy.  For now, just SFTP them using WinSCP.
 - create Makefile for easier compiling when downloading the source directly to the RPi.
 
