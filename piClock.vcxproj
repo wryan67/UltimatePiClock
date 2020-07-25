@@ -76,6 +76,10 @@
   <ItemGroup>
     <None Include="readme\LCD1602-datasheet.pdf" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="images\BlueAngles4.png" />
+    <Image Include="images\BlueAngles5.png" />
+  </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
       <AdditionalOptions>-lpthread -lwiringPiDev -lwiringPiUDDrpi</AdditionalOptions>
