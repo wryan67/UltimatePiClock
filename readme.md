@@ -32,6 +32,12 @@ Use git to download the software from github.com:
 
     $ cd to 
 
+## Setup
+
+Create this folder and put image files in the folder.  There's some demo images in the ~/projects/UltimatePiClock/imgages folder to get you started.
+
+    $ mkdir -p $HOME/Pictures/clock
+
 ## Demos
 
 Follow the youtube link to see the scrolling marquee in action.
