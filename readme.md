@@ -1,5 +1,5 @@
-LCD Clock
----------
+Ultimate Pi Clock
+-----------------
 
 This is the ultimate clock for your Raspberry Pi.  Features include:
 
@@ -15,7 +15,6 @@ This is the ultimate clock for your Raspberry Pi.  Features include:
 - Add alarms
 - Add support for true type fonts
 - instructions for sharing your image folder to make copying your photos to the RPi easy.  For now, just SFTP them using WinSCP.
-- create Makefile for easier compiling when downloading the source directly to the RPi.
 
 ## Prerequisites
 
@@ -34,7 +33,11 @@ Use git to download the software from github.com:
 
 ## Compiling
 
-Currently using Visual Studio Community Edition for development and compiling.
+Using make
+
+    $ make clean && make
+
+Using Visual Studio
 
     1. Open the piClock.sln using Visual Studio 
     2. Setup your Remote Build Machine
@@ -50,7 +53,30 @@ Create this folder and put image files in the folder.  There's some demo images 
 
 ## Running
 
-    $ /home/pi/projects/piClock/bin/ARM/Debug/piClock.out -p /home/pi/Pictures/clock -i 66000000 -d -f2 -m 'Hello World!!!!!!'
+Example when compiled using make:
+
+    Program initialization
+    displayId:         0
+    width:             240
+    height:            320
+    xOffset:           0
+    yOffset:           0
+    cs:                21
+    dc:                22
+    rst:               23
+    blk:               7
+    busy pin:          -1
+    spiChannel:        0
+    spiSpeed:          66000000
+    handle:            5
+    bme280_address=76
+    updating clock... speed=100ms
+    imagemagick conversion cmd: convert /home/wryan/Pictures/clock/BlueAngles4.png -resize 320x240 -background black -gravity center -extent 320x240 -type truecolor bmp:-
+
+
+
+Example when compiled using Visual Studio:
+$ /home/pi/projects/piClock/bin/ARM/Debug/piClock.out -p /home/pi/Pictures/clock -i 66000000 -d -f2 -m 'Hello World!!!!!!'
     Program initialization
     displayId:         0
     width:             240
