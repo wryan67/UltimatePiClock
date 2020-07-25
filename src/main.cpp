@@ -28,7 +28,7 @@ int marquee = 0;
 int innerStep = 16;
 int marqueeSpeed = 100;
 
-char* pictureFolderName = "~/Pictures/clock";
+const char* pictureFolderName = "~/Pictures/clock";
  
 enum ProcessLocks {
     IMAGE_LOCK
@@ -402,6 +402,7 @@ int random(int low, int high) {
 void* pushBuffer(void *) {
     write(imagePipes[1], imageBuffer, imageBufferSize);
     close(imagePipes[1]);
+    return NULL;
 }
 
 void loadImage(Image& image) {

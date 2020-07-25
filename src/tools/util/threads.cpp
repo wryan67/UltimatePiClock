@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
-pthread_t threadCreate(void *(*method)(void *), char *description) {
+pthread_t threadCreate(void *(*method)(void *), const char *description) {
 	pthread_t threadId;
 	int status= pthread_create(&threadId, NULL, method, NULL);
 	if (status != 0) {
