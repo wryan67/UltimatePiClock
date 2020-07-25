@@ -55,6 +55,7 @@ Create this folder and put image files in the folder.  There's some demo images 
 
 Example when compiled using make:
 
+    $ ./piClock -p /home/wryan/Pictures/clock -i 66000000 -d -f2 -m 'Hello World!!!!!'
     Program initialization
     displayId:         0
     width:             240
@@ -76,7 +77,8 @@ Example when compiled using make:
 
 
 Example when compiled using Visual Studio:
-$ /home/pi/projects/piClock/bin/ARM/Debug/piClock.out -p /home/pi/Pictures/clock -i 66000000 -d -f2 -m 'Hello World!!!!!!'
+
+    $ /home/pi/projects/piClock/bin/ARM/Debug/piClock.out -p /home/pi/Pictures/clock -i 66000000 -d -f2 -m 'Hello World!!!!!!'
     Program initialization
     displayId:         0
     width:             240
