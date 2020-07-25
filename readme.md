@@ -18,9 +18,9 @@ This is the ultimate clock for your Raspberry Pi.  Features include:
 
 Please follow the instructions for these projects to install the respective libraries:
 
-- https://github.com/wryan67/bme280_rpi_lib
-- https://github.com/wryan67/udd_rpi_lib/blob/master/README.md  && the [[Wiki page]](https://github.com/wryan67/udd_rpi_lib/wiki)
-- [WiringPi](http://wiringpi.com/), which should be installed already, but you may have to follow the [update instructions](http://wiringpi.com/wiringpi-updated-to-2-52-for-the-raspberry-pi-4b/) for a RPi4
+> * https://github.com/wryan67/bme280_rpi_lib
+> * https://github.com/wryan67/udd_rpi_lib/blob/master/README.md  && the [[Wiki page]](https://github.com/wryan67/udd_rpi_lib/wiki)
+> * [WiringPi](http://wiringpi.com/), which should be installed already, but you may have to follow the [update instructions](http://wiringpi.com/wiringpi-updated-to-2-52-for-the-raspberry-pi-4b/) for a RPi4
 
 ## Downloading
 
