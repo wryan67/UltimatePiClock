@@ -412,7 +412,7 @@ void loadImage(Image& image) {
     updateFileList();
 
     sprintf(screenSize, "%dx%d", d1.config.height, d1.config.width);
-    sprintf(tmpstr,     "convert %s -resize %s -background black -gravity center -extent %s -format bmp bmp:-",
+    sprintf(tmpstr,     "convert %s -resize %s -background black -gravity center -extent %s -type truecolor bmp:-",
                         pictureFiles[random(0,pictureFiles.size()-1)], screenSize, screenSize);
 
     fprintf(stderr, "imagemagick conversion cmd: %s\n", tmpstr); fflush(stderr);
