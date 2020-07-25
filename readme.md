@@ -13,6 +13,7 @@ This is the ultimate clock for your Raspberry Pi.  Features include:
 ## TODO:
 - Add alarms
 - instructions for sharing your image folder to make copying your photos to the RPi easy.  For now, just SFTP them using WinSCP.
+- create Makefile for easier compiling when downloading the source directly to the RPi.
 
 ## Prerequisites
 
@@ -31,7 +32,9 @@ Use git to download the software from github.com:
 
 ## Compiling
 
-    $ cd to 
+Currently using Visual Studio for development and compiling.
+
+    Visual Studio 
 
 ## Setup
 
