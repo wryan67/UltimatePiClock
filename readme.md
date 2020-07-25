@@ -3,8 +3,8 @@ LCD Clock
 
 This is the ultimate clock for your Raspberry Pi.  Features include:
 
-- Multiple displays are supported.  
 - Multiple time and date formats are supported.   
+- Multiple displays are supported via the [universal display driver](https://github.com/wryan67/udd_rpi_lib/blob/master/README.md).  
 - The current humidity and temperature are supported via a [BME280](https://smile.amazon.com/gp/product/B07KYJNFMD) chip.  
 - The background changes every 30 seconds.  
 - Multiple image formats are supported via [ImageMagic](https://imagemagick.org/)
