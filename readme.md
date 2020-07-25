@@ -34,7 +34,10 @@ Use git to download the software from github.com:
 
 Currently using Visual Studio for development and compiling.
 
-    Visual Studio 
+    1. Open the piClock.sln using Visual Studio 
+    2. Setup your Remote Build Machine
+    3. Update the remote headers for your RPi (tools/Cross Platorm/Connection Manager/Remote Headers IntelliSense)
+    3. Build Solution.
 
 ## Setup
 
