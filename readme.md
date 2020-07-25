@@ -20,6 +20,13 @@ Please follow the instructions on the bme280 library project folder:
 ## Demos
 
 Follow the youtube link to see the scrolling marquee in action.
--https://youtu.be/iBVsrxbjaWs
+
+- https://youtu.be/iBVsrxbjaWs
+
 ![pi clock](https://github.com/wryan67/UltimatePiClock/blob/master/readme/image3.jpeg?raw=true)
 ![pi clock](https://github.com/wryan67/UltimatePiClock/blob/master/readme/image4.jpeg?raw=true)
+
+
+## Tip
+I soldered an RJ45 jack directly onto the back of the display, to make connecting it and moving it around a bit easier.
+![pi clock](https://github.com/wryan67/UltimatePiClock/blob/master/readme/example1.jpg?raw=true)
