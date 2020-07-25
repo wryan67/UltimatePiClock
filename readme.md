@@ -20,7 +20,7 @@ Please follow the instructions for these projects to install the respective libr
 
 - https://github.com/wryan67/bme280_rpi_lib
 - https://github.com/wryan67/udd_rpi_lib/blob/master/README.md  && the [[Wiki page]](https://github.com/wryan67/udd_rpi_lib/wiki)
-- [WiringPi](wiringPi.com)
+- [WiringPi](http://wiringpi.com/)
 
 ## Downloading
 
