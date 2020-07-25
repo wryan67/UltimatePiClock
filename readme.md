@@ -18,9 +18,6 @@ Please follow the instructions on the bme280 library project folder:
 - https://github.com/wryan67/bme280_rpi_lib
 
 
-## Circuit Diagram
-
-![circuit diagram](https://github.com/wryan67/UltimatePiClock/blob/master/readme/circuit%20diagram.png?raw=true)
 
 ## Demos
 
@@ -32,6 +29,12 @@ Follow the youtube link to see the scrolling marquee in action.
 ![pi clock preview 2](https://github.com/wryan67/UltimatePiClock/blob/master/readme/image4.jpeg?raw=true)
 
 
+## Circuit Diagram
+
+![circuit diagram](https://github.com/wryan67/UltimatePiClock/blob/master/readme/circuit%20diagram.png?raw=true)
+
+
 ## Tip
 I soldered an RJ45 jack directly onto the back of the display, to make connecting it and moving it around a bit easier.
 ![pi clock](https://github.com/wryan67/UltimatePiClock/blob/master/readme/example1.jpg?raw=true)
+
