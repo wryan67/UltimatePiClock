@@ -17,14 +17,19 @@ Please follow the instructions on the bme280 library project folder:
 
 - https://github.com/wryan67/bme280_rpi_lib
 
+
+## Circuit Diagram
+
+![circuit diagram](https://github.com/wryan67/UltimatePiClock/blob/master/readme/circuit diagram.png?raw=true)
+
 ## Demos
 
 Follow the youtube link to see the scrolling marquee in action.
 
 - https://youtu.be/iBVsrxbjaWs
 
-![pi clock](https://github.com/wryan67/UltimatePiClock/blob/master/readme/image3.jpeg?raw=true)
-![pi clock](https://github.com/wryan67/UltimatePiClock/blob/master/readme/image4.jpeg?raw=true)
+![pi clock preview 1](https://github.com/wryan67/UltimatePiClock/blob/master/readme/image3.jpeg?raw=true)
+![pi clock preview 2](https://github.com/wryan67/UltimatePiClock/blob/master/readme/image4.jpeg?raw=true)
 
 
 ## Tip
