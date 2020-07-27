@@ -232,7 +232,7 @@ void imageCopy(Image& destinationImage, int destinationX, int destinationY, Imag
 }
 
 
-void updateClock(Image *image) {
+void updateClock(Image &image) {
 
     auto now = std::chrono::system_clock::now();
     std::time_t end_time = std::chrono::system_clock::to_time_t(now);
@@ -302,57 +302,58 @@ void updateClock(Image *image) {
         char message[128];
         strcpy(message, vtime);
 
-        int charHeight = 23;
-        int charWidth = 17;
+        int charHeight = 24;
+        int charWidth  = 17;
 
-        int startText = midX - ((marqueeVisableChars/2) * charWidth);
+        int startText = midX - ((marqueeVisableChars/2) * charWidth)  - 3;
+        int endText   = startText + (marqueeVisableChars * charWidth) + 4;
+
+        int   tmpWidth = marqueeVisableChars * charWidth + 5;
+        int   tmpHeight = charHeight + 1;
+        Image tmpimg = Image(tmpWidth, tmpHeight, DARK_GRAY_BLUE);
+
+
+// top text
+        tmpimg.drawText(3, 1, message, &Font24, DARK_GRAY_BLUE, WHITE);
+ 
+        tmpimg.drawLine(         0, tmpHeight-1, tmpWidth-1, tmpHeight-1,  WHITE, SOLID, 1);  // top line
+        tmpimg.drawLine(         0,           0,          0, tmpHeight-1,  WHITE, SOLID, 1);  // left line
+        tmpimg.drawLine(tmpWidth-1,           0, tmpWidth-1, tmpHeight-1,  WHITE, SOLID, 1);  // right line
 
         piLock(IMAGE_LOCK);
-
-        // top text
-        image->drawText(startText, minY, message, &Font24, DARK_GRAY_BLUE, WHITE);
-
-        // top - right ling
-        image->drawLine(startText + (marqueeVisableChars * charWidth), minY, startText + (marqueeVisableChars * charWidth), minY + charHeight, DARK_GRAY_BLUE, SOLID, 1);
-        image->drawLine(startText + (marqueeVisableChars * charWidth) + 1, minY, startText + (marqueeVisableChars * charWidth) + 1, minY + charHeight, WHITE, SOLID, 1);
-
-        // top - left line
-        image->drawLine(startText - 1, minY, startText - 1, minY + charHeight, DARK_GRAY_BLUE, SOLID, 1);
-        image->drawLine(startText - 2, minY, startText - 2, minY + charHeight, WHITE, SOLID, 1);
-
-        // top - bottom line
-        image->drawLine(startText - 1, minY + charHeight + 0, startText + (marqueeVisableChars * charWidth), minY + charHeight + 0, WHITE, SOLID, 1);
-
-
-        // bottom text
-        Image tmpimg = Image(charWidth * (strlen(tmpstr2)+2), charHeight*2, BLACK);
-
-        tmpimg.drawText(0, 0, tmpstr2, &Font24, DARK_GRAY_BLUE, WHITE);
-
-        int windowWidth = marqueeVisableChars * charWidth;
-
-        ++marquee;
-
-        int messageWidth = (strlen(tmpstr1) + 2) * charWidth;
-
-        imageCopy(*image, startText, maxY - charHeight + 1,
-            tmpimg, marquee % (messageWidth), 0,
-            windowWidth, charHeight);
-
-        // bottom - bottom line
-        image->drawLine(startText - 1, maxY - charHeight, startText + (marqueeVisableChars * charWidth), maxY - charHeight, WHITE, SOLID, 1);
-
-        // bottom - right ling
-        image->drawLine(startText + (marqueeVisableChars * charWidth) + 1, maxY-charHeight, startText + (marqueeVisableChars * charWidth) + 1, maxY, WHITE, SOLID, 1);
-
-        // bottom - left line
-        image->drawLine(startText - 2, maxY-charHeight, startText - 2, maxY, WHITE, SOLID, 1);
-
-        tmpimg.close();
-
-        d1.showImage(*image, DEGREE_270);
+        d1.showImage(tmpimg, Point(startText, 0), Point(endText, tmpimg.getHeight()-1), DEGREE_270);
         piUnlock(IMAGE_LOCK);
 
+// bottom text
+        ++marquee;
+        Image textBlock = Image(charWidth * (strlen(tmpstr2) + 2), charHeight * 2, DARK_GRAY_BLUE);
+        textBlock.clear(DARK_GRAY_BLUE);
+        textBlock.drawText(0, 0, tmpstr2, &Font24, DARK_GRAY_BLUE, WHITE);
+
+        int   messageWidth = (strlen(tmpstr1) + 2) * charWidth;
+
+        tmpimg.drawLine(         0, 0,  tmpWidth-1,           0,  WHITE, SOLID, 1);  // top line
+        tmpimg.drawLine(         0, 0,           0, tmpHeight-1,  WHITE, SOLID, 1);  // left line
+        tmpimg.drawLine(tmpWidth-1, 0,  tmpWidth-1, tmpHeight-1,  WHITE, SOLID, 1);  // right line
+
+
+//void imageCopy(Image& destinationImage, int destinationX, int destinationY, 
+//               Image& sourceImage, int sourceX, int sourceY, 
+//               int windowWidth, int windowHeight) {
+
+        imageCopy(tmpimg, 1, 1,
+            textBlock, marquee % (messageWidth), 0,
+            tmpWidth-2, charHeight);
+
+
+        piLock(IMAGE_LOCK);
+        d1.showImage(tmpimg, Point(startText,maxY-charHeight), Point(endText, maxY), DEGREE_270);
+        piUnlock(IMAGE_LOCK);
+
+        tmpimg.close();
+        textBlock.close();
+
+       // exit(0);
     }
 }
 
@@ -442,6 +443,9 @@ void loadImage(Image& image) {
 
     piLock(IMAGE_LOCK);
     image.loadBMP(fdopen(imagePipes[0],"r"), 0, 0);
+
+    d1.showImage(image, DEGREE_270);
+
     piUnlock(IMAGE_LOCK);
     close(imagePipes[0]);
     free(imageBuffer);
@@ -469,7 +473,7 @@ void *updateImageLoop(void *) {
 void* updateClockLoop(void*) {
 
     while (true) {
-        updateClock(&clockImage);
+        updateClock(clockImage);
     }
 }
 
@@ -485,7 +489,7 @@ int main(int argc, char **argv)
 		printf("setup failed\n");
 		return 1;
 	}
-    d1.clear(BLACK);
+    d1.clearScreen(DARK_BLUE);
 
     printf("bme280_address=%02x\n", bme280_address);
 
@@ -511,7 +515,7 @@ int main(int argc, char **argv)
 		}
 	} else {
         Image img = Image(320, 240, BLACK);
-        updateClock(&img);
+        updateClock(img);
 	}
 
 
