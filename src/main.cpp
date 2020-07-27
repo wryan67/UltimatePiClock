@@ -27,6 +27,7 @@
 int marquee = 0;
 int innerStep = 16;
 int marqueeSpeed = 100;
+char lastTopMessage[128] = { 0 };
 
 const char* pictureFolderName = "~/Pictures/clock";
  
@@ -232,6 +233,7 @@ void imageCopy(Image& destinationImage, int destinationX, int destinationY, Imag
 }
 
 
+
 void updateClock(Image &image) {
 
     auto now = std::chrono::system_clock::now();
@@ -312,17 +314,20 @@ void updateClock(Image &image) {
         int   tmpHeight = charHeight + 1;
         Image tmpimg = Image(tmpWidth, tmpHeight, DARK_GRAY_BLUE);
 
+        if (strcmp(message, lastTopMessage)) {
 
-// top text
-        tmpimg.drawText(3, 1, message, &Font24, DARK_GRAY_BLUE, WHITE);
- 
-        tmpimg.drawLine(         0, tmpHeight-1, tmpWidth-1, tmpHeight-1,  WHITE, SOLID, 1);  // top line
-        tmpimg.drawLine(         0,           0,          0, tmpHeight-1,  WHITE, SOLID, 1);  // left line
-        tmpimg.drawLine(tmpWidth-1,           0, tmpWidth-1, tmpHeight-1,  WHITE, SOLID, 1);  // right line
+            // top text
+            tmpimg.drawText(3, 1, message, &Font24, DARK_GRAY_BLUE, WHITE);
 
-        piLock(IMAGE_LOCK);
-        d1.showImage(tmpimg, Point(startText, 0), Point(endText, tmpimg.getHeight()-1), DEGREE_270);
-        piUnlock(IMAGE_LOCK);
+            tmpimg.drawLine(0, tmpHeight - 1, tmpWidth - 1, tmpHeight - 1, WHITE, SOLID, 1);  // top line
+            tmpimg.drawLine(0, 0, 0, tmpHeight - 1, WHITE, SOLID, 1);  // left line
+            tmpimg.drawLine(tmpWidth - 1, 0, tmpWidth - 1, tmpHeight - 1, WHITE, SOLID, 1);  // right line
+
+            piLock(IMAGE_LOCK);
+            strcpy(lastTopMessage, message);
+            d1.showImage(tmpimg, Point(startText, 0), Point(endText, tmpimg.getHeight() - 1), DEGREE_270);
+            piUnlock(IMAGE_LOCK);
+        }
 
 // bottom text
         ++marquee;
@@ -337,13 +342,7 @@ void updateClock(Image &image) {
         tmpimg.drawLine(tmpWidth-1, 0,  tmpWidth-1, tmpHeight-1,  WHITE, SOLID, 1);  // right line
 
 
-//void imageCopy(Image& destinationImage, int destinationX, int destinationY, 
-//               Image& sourceImage, int sourceX, int sourceY, 
-//               int windowWidth, int windowHeight) {
-
-        imageCopy(tmpimg, 1, 1,
-            textBlock, marquee % (messageWidth), 0,
-            tmpWidth-2, charHeight);
+        imageCopy(tmpimg, 1, 1, textBlock, marquee % (messageWidth), 0, tmpWidth-2, charHeight);
 
 
         piLock(IMAGE_LOCK);
@@ -442,6 +441,7 @@ void loadImage(Image& image) {
     threadCreate(pushBuffer, "pushBuffer");
 
     piLock(IMAGE_LOCK);
+    lastTopMessage[0] = 0;
     image.loadBMP(fdopen(imagePipes[0],"r"), 0, 0);
 
     d1.showImage(image, DEGREE_270);
