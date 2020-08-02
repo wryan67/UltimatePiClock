@@ -55,13 +55,15 @@ Create this folder and put image files in the folder.  There's some demo images 
 
 Example when compiled using make:
 
-    $ ./piClock -p /home/wryan/Pictures/clock -i 66000000 -d -f2 -m 'Hello World!!!!!'
+    $ ./piClock -r 90 -p /home/wryan/Pictures/clock -i 66000000 -d -f2 -m 'Hello World!!!!!'
     Program initialization
     displayId:         0
     width:             240
     height:            320
     xOffset:           0
     yOffset:           0
+    mirror:            0
+    rotation:          0
     cs:                21
     dc:                22
     rst:               23
