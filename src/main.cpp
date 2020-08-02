@@ -27,10 +27,12 @@
 int marquee = 0;
 int innerStep = 16;
 int marqueeSpeed = 100;
-char lastTopMessage[128] = { 0 };
 
+char lastTopMessage[128] = { 0 };
 const char* pictureFolderName = "~/Pictures/clock";
  
+
+
 enum ProcessLocks {
     IMAGE_LOCK
 };
@@ -39,8 +41,10 @@ enum ProcessLocks {
 using namespace udd;
 
 DisplayConfigruation d1Config;
-
 DisplayST7789R d1 = DisplayST7789R();
+
+Rotation clockRotation = DEGREE_0;
+
 
 #ifndef NULL
 #define NULL 0
@@ -85,18 +89,19 @@ unsigned long long currentTimeMillis() {
 
 
 bool usage() {
-	fprintf(stderr, "usage: lcdClock [-d] [-b 00-FF] [-p 0-40] [-f n] [-s speed] [-m motd]\n");
-	fprintf(stderr, "d = daemon mode\n");
+    fprintf(stderr, "usage: lcdClock [-d] [-b 00-FF] [-p 0-40] [-f n] [-s speed] [-m motd]\n");
+    fprintf(stderr, "d = daemon mode\n");
     fprintf(stderr, "i = spi speed (default=90000000)\n");
     fprintf(stderr, "b = bme280 address (hex)\n");
-	fprintf(stderr, "m = message of the day, max %d characters\n", maxMessageSize);
-	fprintf(stderr, "s = marquee speed (ms)\n");
-	fprintf(stderr, "f = clock format\n");
+    fprintf(stderr, "m = message of the day, max %d characters\n", maxMessageSize);
+    fprintf(stderr, "r = clock rotation (default=0)\n");
+    fprintf(stderr, "s = marquee speed (ms)\n");
+    fprintf(stderr, "f = clock format\n");
     fprintf(stderr, "p = picture filename\n");
-	fprintf(stderr, "    1 - Weekday Month Date HH24:SS\n");
-	fprintf(stderr, "    2 - Weekday Date  HH:SS AM/PM\n");
+    fprintf(stderr, "    1 - Weekday Month Date HH24:SS\n");
+    fprintf(stderr, "    2 - Weekday Date  HH:SS AM/PM\n");
 
-	return false;
+    return false;
 }
 
 
@@ -116,27 +121,28 @@ void configureDisplay1() {
 
 
 bool setup() {
-	printf("Program initialization\n");
+    printf("Program initialization\n");
 
 
-	if (int ret = wiringPiSetup()) {
-		fprintf(stderr, "Wiring Pi setup failed, ret=%d\n", ret);
-		return false;
-	}
+    if (int ret = wiringPiSetup()) {
+        fprintf(stderr, "Wiring Pi setup failed, ret=%d\n", ret);
+        return false;
+    }
 
-	int seed;
-	FILE *fp;
-	fp = fopen("/dev/urandom", "r");
-	fread(&seed, sizeof(seed), 1, fp);
-	fclose(fp);
-	srand(seed);
+    int seed;
+    FILE* fp;
+    fp = fopen("/dev/urandom", "r");
+    fread(&seed, sizeof(seed), 1, fp);
+    fclose(fp);
+    srand(seed);
 
-    bme280_fd=bme280_standardSetup(bme280_address, &cal);
+    bme280_fd = bme280_standardSetup(bme280_address, &cal);
 
     configureDisplay1();
 
-	return true;
+    return true;
 }
+
 
 
 
@@ -147,7 +153,7 @@ bool commandLineOptions(int argc, char **argv) {
 		return usage();
 	}
 
-	while ((c = getopt(argc, argv, "db:f:i:m:p:s:")) != -1)
+	while ((c = getopt(argc, argv, "db:f:i:m:p:r:s:")) != -1)
 		switch (c) {
 		case 'd':
 			daemonMode = true;
@@ -173,6 +179,9 @@ bool commandLineOptions(int argc, char **argv) {
 			break;
         case 'p':
             pictureFolderName = optarg;
+            break;
+        case 'r':
+            clockRotation = validateRotation(optarg);
             break;
         case '?':
 			if (optopt == 'a' || optopt == 'p' || optopt == 'f' || optopt == 'm' || optopt == 's')
@@ -325,7 +334,7 @@ void updateClock(Image &image) {
 
             piLock(IMAGE_LOCK);
             strcpy(lastTopMessage, message);
-            d1.showImage(tmpimg, Point(startText, 0), Point(endText, tmpimg.getHeight() - 1), DEGREE_270);
+            d1.showImage(tmpimg, Point(startText, 0), Point(endText, tmpimg.getHeight() - 1), clockRotation);
             piUnlock(IMAGE_LOCK);
         }
 
@@ -346,7 +355,7 @@ void updateClock(Image &image) {
 
 
         piLock(IMAGE_LOCK);
-        d1.showImage(tmpimg, Point(startText,maxY-charHeight), Point(endText, maxY), DEGREE_270);
+        d1.showImage(tmpimg, Point(startText,maxY-charHeight), Point(endText, maxY), clockRotation);
         piUnlock(IMAGE_LOCK);
 
         tmpimg.close();
@@ -444,7 +453,7 @@ void loadImage(Image& image) {
     lastTopMessage[0] = 0;
     image.loadBMP(fdopen(imagePipes[0],"r"), 0, 0);
 
-    d1.showImage(image, DEGREE_270);
+    d1.showImage(image, clockRotation);
 
     piUnlock(IMAGE_LOCK);
     close(imagePipes[0]);
