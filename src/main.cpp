@@ -419,11 +419,29 @@ void loadImage(Image& image) {
     char screenSize[64];
     long bytesRead = 0;
 
-    updateFileList();
+
+    char* imageFile = "";
+    int count = 10;
+    int lastPicture=0;
+    while (strlen(imageFile) < 1) {
+        if (count-- < 10) {
+            delay(5000);
+        }
+        if (count < 0) {
+            fprintf(stderr, "pictureFiles.size()=%d\n", pictureFiles.size());
+            fprintf(stderr, "lastPicture=%d\n", lastPicture);
+            fprintf(stderr, "cannot locate any image files in image folder:  %s\n", pictureFolderName);
+            exit(EXIT_FAILURE);
+        }
+        updateFileList();
+        lastPicture = random(0, pictureFiles.size() - 1);
+        imageFile = pictureFiles[lastPicture];
+    }
+
 
     sprintf(screenSize, "%dx%d", d1.config.height, d1.config.width);
     sprintf(tmpstr,     "convert %s -resize %s -background black -gravity center -extent %s -type truecolor bmp:-",
-                        pictureFiles[random(0,pictureFiles.size()-1)], screenSize, screenSize);
+                        imageFile, screenSize, screenSize);
 
     fprintf(stderr, "imagemagick conversion cmd: %s\n", tmpstr); fflush(stderr);
 
