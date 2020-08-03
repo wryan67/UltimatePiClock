@@ -420,7 +420,7 @@ void loadImage(Image& image) {
     long bytesRead = 0;
 
 
-    char* imageFile = "";
+    const char* imageFile = "";
     int count = 10;
     int lastPicture=0;
     while (strlen(imageFile) < 1) {
