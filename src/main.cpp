@@ -29,7 +29,7 @@ int innerStep = 16;
 int marqueeSpeed = 100;
 
 char lastTopMessage[128] = { 0 };
-const char* pictureFolderName = "~/Pictures/clock";
+const char* pictureFolderName = "~/Pictures/clock/";
  
 
 
