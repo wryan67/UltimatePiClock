@@ -16,10 +16,18 @@ public enum Timezones: String, Equatable, CaseIterable {
     var localizedName: LocalizedStringKey { LocalizedStringKey(rawValue)}
 }
 
-public enum ImageSizeType: String, CaseIterable {
-    case large  = "Large"
-    case medium = "Medium"
-    case small  = "Small"
+public enum TimeType: String, CaseIterable {
+    case hour   = "HH"
+    case minute = "MM"
+
+    var localizedName: LocalizedStringKey { LocalizedStringKey(rawValue)}
+}
+
+public enum TimeFormat: String, CaseIterable {
+    case hour12 = "24-Hour"
+    case hour24 = "12-Hour"
+
+    var localizedName: LocalizedStringKey { LocalizedStringKey(rawValue)}
 }
 
 
@@ -27,9 +35,10 @@ struct ContentView: View {
     @State private var selectedTab = "One"
 
     @State private var timezone: Timezones = Timezones.central
-    @State private var profileImageSize: ImageSizeType = ImageSizeType.medium
     
     @State private var piTime: String="HH:MM"
+    @State private var timeControl: TimeType = TimeType.minute
+    @State private var timeFormat: TimeFormat = TimeFormat.hour12
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -44,8 +53,25 @@ struct ContentView: View {
                                 Spacer()
                                 Text(piTime)
                             }
+                            
                         }
-    
+                        
+                        Section(header: Text("Adjust")) {
+                            HStack {
+                                Picker("Adjust", selection: $timeControl) {
+                                    ForEach(TimeType.allCases, id: \.self) { value in
+                                        Text(value.localizedName)
+                                            .tag(value)
+                                    }
+                                }.pickerStyle(.segmented)
+                                Spacer().frame(width:50)
+                                Button("+") {}.frame(width: 50).buttonStyle(.bordered)
+                                Button("-") {}.frame(width: 50).buttonStyle(.bordered)
+                            }
+                            
+                        }
+
+                        
                         Section(header: Text("Timezone")) {
                             HStack {
                                 Picker("Timezone", selection: $timezone) {
@@ -55,8 +81,17 @@ struct ContentView: View {
                                 }.pickerStyle(.segmented)
                             }
                         }
-                       
-                        Button("Submit") {}
+                        
+                        Section(header: Text("Time Format")) {
+                            HStack {
+                                Picker("Time Format", selection: $timeFormat) {
+                                    ForEach(TimeFormat.allCases, id: \.self) { value in
+                                        Text(value.localizedName).tag(value)
+                                    }
+                                }.pickerStyle(.segmented)
+                            }
+                        }
+                        
                    } .navigationTitle("Timezone Tab")
                 }
             }.tabItem {
