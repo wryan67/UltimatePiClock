@@ -36,7 +36,7 @@ struct ContentView: View {
 
     @State private var timezone: Timezones = Timezones.central
     
-    @State private var piTime: String="HH:MM"
+    @State private var piTime: String="HH:MM TZ"
     @State private var timeControl: TimeType = TimeType.minute
     @State private var timeFormat: TimeFormat = TimeFormat.hour12
     
