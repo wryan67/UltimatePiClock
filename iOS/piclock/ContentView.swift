@@ -38,7 +38,7 @@ struct ContentView: View {
                 VStack {
                     
                     Form {
-                        Section(header: Text("Time")) {
+                        Section(header: Text("Pi Clock")) {
                             HStack {
                                 Text("Current Time:")
                                 Spacer()
