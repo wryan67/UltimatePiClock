@@ -29,8 +29,7 @@ struct ContentView: View {
     @State private var timezone: Timezones = Timezones.central
     @State private var profileImageSize: ImageSizeType = ImageSizeType.medium
     
-    @State private var hh: String=""
-    @State private var mm: String=""
+    @State private var piTime: String="HH:MM"
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -39,27 +38,29 @@ struct ContentView: View {
                 VStack {
                     
                     Form {
-                        Section(header: Text("time")) {
+                        Section(header: Text("Time")) {
                             HStack {
-                                Text("Hour")
-                                TextField("Hour", text: $hh, prompt: Text("HH"))
-                                    .multilineTextAlignment(.trailing)
-                                
-                                TextField("Minute", text: $mm, prompt: Text("MM"))
-                                    .fixedSize()
-                                    .multilineTextAlignment(.trailing)
+                                Text("Current Time:")
+                                Spacer()
+                                Text(piTime)
                             }
                         }
     
                         Section(header: Text("Timezone")) {
-                            Picker("Timezone", selection: $timezone) {
-                                ForEach(Timezones.allCases, id: \.self) { value in
-                                    Text(value.localizedName).tag(value).padding()
-                                }
-                            }   .pickerStyle(.wheel)
-                                .padding(.leading, 78.0)
-                                .frame(width: 200.0, height: 50)
-                        }.alignmentGuide(.trailing) { d in d[.trailing] }
+                            HStack {
+                                Picker("Timezone", selection: $timezone) {
+                                    ForEach(Timezones.allCases, id: \.self) { value in
+                                        Text(value.localizedName)
+                                            .tag(value)
+                                            .padding()
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .multilineTextAlignment(.leading)
+                                    }
+                                }   .pickerStyle(.wheel)
+                                    .frame(width:0, height: 60)
+                            }.frame(maxWidth: .infinity)
+                                .multilineTextAlignment(.center)
+                        }
                        
                         Button("Submit") {}
                    } .navigationTitle("Timezone Tab")
@@ -95,3 +96,4 @@ struct ContentView_Previews: PreviewProvider {
             .previewInterfaceOrientation(.portraitUpsideDown)
     }
 }
+
