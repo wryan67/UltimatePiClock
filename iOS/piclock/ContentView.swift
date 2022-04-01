@@ -50,16 +50,10 @@ struct ContentView: View {
                             HStack {
                                 Picker("Timezone", selection: $timezone) {
                                     ForEach(Timezones.allCases, id: \.self) { value in
-                                        Text(value.localizedName)
-                                            .tag(value)
-                                            .padding()
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .multilineTextAlignment(.leading)
+                                        Text(value.localizedName).tag(value)
                                     }
-                                }   .pickerStyle(.wheel)
-                                    .frame(width:0, height: 60)
-                            }.frame(maxWidth: .infinity)
-                                .multilineTextAlignment(.center)
+                                }.pickerStyle(.segmented)
+                            }
                         }
                        
                         Button("Submit") {}
