@@ -1,10 +1,12 @@
 #!/bin/bash
 
-CT=`ps -ef | grep python | grep cputemp.py | wc -l`
+MAIN=piclock.py
+
+CT=`ps -ef | grep python | grep $MAIN | wc -l`
 
 if [ $CT -lt 1 ];then
-  echo cputemp is not running
+  echo service is not running
 else
-  sudo kill -9 `ps -ef | grep python | grep cputemp.py | awk '{print $2}'`
-  echo killed cputemp 
+  sudo kill -9 `ps -ef | grep python | grep $MAIN | awk '{print $2}'`
+  echo killed service 
 fi
