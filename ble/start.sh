@@ -1,12 +1,12 @@
 #!/bin/bash
 
-CT=`ps -ef | grep python | grep cputemp.py | wc -l`
+CT=`ps -ef | grep python | grep main.py | wc -l`
 
 if [ $CT -lt 1 ];then
   cd `dirname $0`
-  nohup sudo ./cputemp.py > cputemp.log 2>&1 &
-  echo cputemp started
+  nohup sudo ./main.py > server.log 2>&1 &
+  echo service started
 else
-  ps -ef | grep python | grep cputemp.py 
-  echo cputemp is running
+  ps -ef | grep python | grep main.py 
+  echo service is running
 fi
