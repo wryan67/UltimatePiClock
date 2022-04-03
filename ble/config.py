@@ -36,4 +36,4 @@ def readConfig():
 
     return config
 
-configuration=readConfig()
+settings=readConfig()

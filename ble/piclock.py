@@ -71,7 +71,7 @@ app.register()
 adv = ServiceAdvertisement(0)
 adv.register()
 
-print("dateFormat: " + str(config.configuration['dateFormat']))
+print("dateFormat: " + str(config.settings['dateFormat']))
 
 try:
     app.run()
