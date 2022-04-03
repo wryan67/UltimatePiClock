@@ -1,9 +1,16 @@
 #!/bin/ksh
 
+if [ $# -lt 1 ];then
+  echo usage: readPiClock.sh [Characteristic number:1-5]
+  exit 
+fi
+
+CHARACTERISTIC=$1
+
 DEVICE="B8:27:EB:13:1C:88"
 
 HA=$(sudo gatttool -i hci0 -b $DEVICE --characteristics | 
-  grep -- $1-9233-face-8d75-3e5b444bc3cf |
+  grep -- ${CHARACTERISTIC}-9233-face-8d75-3e5b444bc3cf |
   sed -ne 's/.*char value handle.*0x\([0-9a-f]*\).*/\1/p'
 )
 

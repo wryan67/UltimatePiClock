@@ -1,7 +1,8 @@
 
-import os
 import dbus
 import common
+import util
+import config
 
 from service import Characteristic, Descriptor
 
@@ -18,18 +19,16 @@ class TimeCharacteristic(Characteristic):
         self.add_descriptor(TimeDescriptor(self))
 
     def get_time(self):
-        global config
-
         value = []
 
-
-        if config['dateFormat'] == 1:
-            pdate = os.popen("date '+%I:%M %p %Z'")
+        if config.configuration['dateFormat'] == 1:
+            cmd = "date '+%I:%M %p %Z'"
         else:
-            pdate = os.popen("date '+%H:%M %Z'")
+            cmd = "date '+%H:%M %Z'"
 
-        now = pdate.read()
-        pdate.close()
+        # cmd="date +%H:%M"
+
+        now = util.execOne(cmd)
 
         strtemp = str(now.strip())
         for c in strtemp:
