@@ -24,20 +24,15 @@ SOFTWARE.
 import os
 import dbus
 import json
+import util
 
 from advertisement import Advertisement
 from service import Application, Service, Characteristic, Descriptor
 from gpiozero import CPUTemperature
 
-GATT_CHRC_IFACE = "org.bluez.GattCharacteristic1"
-NOTIFY_TIMEOUT = 5000
+import common
+import time_cx
 
-
-def execOne(command):
-    cmd = os.popen(command)
-    line = cmd.read()
-    cmd.close()
-    return line.strip()
 
 class ServiceAdvertisement(Advertisement):
     def __init__(self, index):
@@ -52,7 +47,7 @@ class ClockService(Service):
         self.fahrenheit = False
 
         Service.__init__(self, index, self.CLOCK_SVC_UUID, True)
-        self.add_characteristic(TimeCharacteristic(self))
+        self.add_characteristic(time_cx.TimeCharacteristic(self))
         self.add_characteristic(TempCharacteristic(self))
         self.add_characteristic(UnitCharacteristic(self))
 
@@ -63,61 +58,6 @@ class ClockService(Service):
         self.fahrenheit = fahrenheit
 
 
-class TimeCharacteristic(Characteristic):
-    TIME_CHARACTERISTIC_UUID = "00000004-9233-face-8d75-3e5b444bc3cf"
-
-    def __init__(self, service):
-        self.notifying = False
-
-        Characteristic.__init__(
-                self, self.TIME_CHARACTERISTIC_UUID,
-                ["notify", "read"], service)
-        self.add_descriptor(TimeDescriptor(self))
-
-    def get_time(self):
-        global config
-
-        value = []
-
-        
-        if config['dateFormat'] == 1:
-            pdate = os.popen("date '+%I:%M %p %Z'")
-        else:
-            pdate = os.popen("date '+%H:%M %Z'")
-
-        now = pdate.read()
-        pdate.close()
- 
-        strtemp = str(now.strip())
-        for c in strtemp:
-            value.append(dbus.Byte(c.encode()))
-
-        return value
-
-    def set_time_callback(self):
-        if self.notifying:
-            value = self.get_time()
-            self.PropertiesChanged(GATT_CHRC_IFACE, {"Value": value}, [])
-
-        return self.notifying
-
-    def StartNotify(self):
-        if self.notifying:
-            return
-
-        self.notifying = True
-
-        value = self.get_time()
-        self.PropertiesChanged(GATT_CHRC_IFACE, {"Value": value}, [])
-        self.add_timeout(NOTIFY_TIMEOUT, self.set_time_callback)
-
-    def StopNotify(self):
-        self.notifying = False
-
-    def ReadValue(self, options):
-        value = self.get_time()
-
-        return value
 
 class TempCharacteristic(Characteristic):
     TEMP_CHARACTERISTIC_UUID = "00000002-9233-face-8d75-3e5b444bc3cf"
@@ -149,7 +89,7 @@ class TempCharacteristic(Characteristic):
     def set_temperature_callback(self):
         if self.notifying:
             value = self.get_temperature()
-            self.PropertiesChanged(GATT_CHRC_IFACE, {"Value": value}, [])
+            self.PropertiesChanged(common.GATT_CHRC_IFACE, {"Value": value}, [])
 
         return self.notifying
 
@@ -160,8 +100,8 @@ class TempCharacteristic(Characteristic):
         self.notifying = True
 
         value = self.get_temperature()
-        self.PropertiesChanged(GATT_CHRC_IFACE, {"Value": value}, [])
-        self.add_timeout(NOTIFY_TIMEOUT, self.set_temperature_callback)
+        self.PropertiesChanged(common.GATT_CHRC_IFACE, {"Value": value}, [])
+        self.add_timeout(common.NOTIFY_TIMEOUT, self.set_temperature_callback)
 
     def StopNotify(self):
         self.notifying = False
@@ -171,24 +111,7 @@ class TempCharacteristic(Characteristic):
 
         return value
 
-class TimeDescriptor(Descriptor):
-    TIME_DESCRIPTOR_UUID = "2901"
-    TIME_DESCRIPTOR_VALUE = "Current Time"
 
-    def __init__(self, characteristic):
-        Descriptor.__init__(
-                self, self.TIME_DESCRIPTOR_UUID,
-                ["read"],
-                characteristic)
-
-    def ReadValue(self, options):
-        value = []
-        desc = self.TIME_DESCRIPTOR_VALUE
-
-        for c in desc:
-            value.append(dbus.Byte(c.encode()))
-
-        return value
 
 class TempDescriptor(Descriptor):
     TEMP_DESCRIPTOR_UUID = "2901"
@@ -280,7 +203,7 @@ def readConfig():
 #:############:#
 
 logname=os.getlogin()
-home=execOne("awk -F: '{if($1==\""+logname+"\")print $6}' /etc/passwd")
+home=util.execOne("awk -F: '{if($1==\""+logname+"\")print $6}' /etc/passwd")
 configPath = home+"/.config/piclock"
 
 app = Application()
