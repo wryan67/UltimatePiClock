@@ -8,13 +8,12 @@ from service import Characteristic, Descriptor
 
 
 class TimeCharacteristic(Characteristic):
-    TIME_CHARACTERISTIC_UUID = "00000004-9233-face-8d75-3e5b444bc3cf"
 
     def __init__(self, service):
         self.notifying = False
 
         Characteristic.__init__(
-            self, self.TIME_CHARACTERISTIC_UUID,
+            self, common.TIME_CHARACTERISTIC_UUID,
             ["notify", "read"], service)
         self.add_descriptor(TimeDescriptor(self))
 
@@ -63,12 +62,11 @@ class TimeCharacteristic(Characteristic):
 
 
 class TimeDescriptor(Descriptor):
-    TIME_DESCRIPTOR_UUID = "2901"
     TIME_DESCRIPTOR_VALUE = "Current Time"
 
     def __init__(self, characteristic):
         Descriptor.__init__(
-                self, self.TIME_DESCRIPTOR_UUID,
+                self, common.TIME_DESCRIPTOR_UUID,
                 ["read"],
                 characteristic)
 

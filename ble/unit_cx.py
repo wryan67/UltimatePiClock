@@ -1,16 +1,15 @@
 
-
+import common
 import dbus
 
 from service import Characteristic, Descriptor
 
 
 class UnitCharacteristic(Characteristic):
-    UNIT_CHARACTERISTIC_UUID = "00000003-9233-face-8d75-3e5b444bc3cf"
 
     def __init__(self, service):
         Characteristic.__init__(
-                self, self.UNIT_CHARACTERISTIC_UUID,
+                self, common.UNIT_CHARACTERISTIC_UUID,
                 ["read", "write"], service)
         self.add_descriptor(UnitDescriptor(self))
 
@@ -31,12 +30,11 @@ class UnitCharacteristic(Characteristic):
         return value
 
 class UnitDescriptor(Descriptor):
-    UNIT_DESCRIPTOR_UUID = "2901"
     UNIT_DESCRIPTOR_VALUE = "Temperature Units (F or C)"
 
     def __init__(self, characteristic):
         Descriptor.__init__(
-                self, self.UNIT_DESCRIPTOR_UUID,
+                self, common.UNIT_DESCRIPTOR_UUID,
                 ["read"],
                 characteristic)
 

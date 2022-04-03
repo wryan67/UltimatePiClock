@@ -8,13 +8,12 @@ from gpiozero import CPUTemperature
 
 
 class TempCharacteristic(Characteristic):
-    TEMP_CHARACTERISTIC_UUID = "00000002-9233-face-8d75-3e5b444bc3cf"
 
     def __init__(self, service):
         self.notifying = False
 
         Characteristic.__init__(
-                self, self.TEMP_CHARACTERISTIC_UUID,
+                self, common.TEMP_CHARACTERISTIC_UUID,
                 ["notify", "read"], service)
         self.add_descriptor(TempDescriptor(self))
 
@@ -62,12 +61,11 @@ class TempCharacteristic(Characteristic):
 
 
 class TempDescriptor(Descriptor):
-    TEMP_DESCRIPTOR_UUID = "2901"
     TEMP_DESCRIPTOR_VALUE = "CPU Temperature"
 
     def __init__(self, characteristic):
         Descriptor.__init__(
-                self, self.TEMP_DESCRIPTOR_UUID,
+                self, common.TEMP_DESCRIPTOR_UUID,
                 ["read"],
                 characteristic)
 

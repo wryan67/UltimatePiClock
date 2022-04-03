@@ -22,6 +22,9 @@ SOFTWARE.
 import dbus
 import dbus.mainloop.glib
 import dbus.exceptions
+
+import common
+
 try:
   from gi.repository import GObject
 except ImportError:
@@ -294,7 +297,6 @@ class Descriptor(dbus.service.Object):
 
 
 class CharacteristicUserDescriptionDescriptor(Descriptor):
-    CUD_UUID = '2901'
 
     def __init__(self, bus, index, characteristic):
         self.writable = 'writable-auxiliaries' in characteristic.flags
@@ -302,7 +304,7 @@ class CharacteristicUserDescriptionDescriptor(Descriptor):
         self.value = self.value.tolist()
         Descriptor.__init__(
                 self, bus, index,
-                self.CUD_UUID,
+                common.CUD_UUID,
                 ['read', 'write'],
                 characteristic)
 
