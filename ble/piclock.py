@@ -23,6 +23,7 @@ SOFTWARE.
 
 import os
 import dbus
+import json
 
 from advertisement import Advertisement
 from service import Application, Service, Characteristic, Descriptor
@@ -31,7 +32,12 @@ from gpiozero import CPUTemperature
 GATT_CHRC_IFACE = "org.bluez.GattCharacteristic1"
 NOTIFY_TIMEOUT = 5000
 
-dateFormat = 1
+
+def execOne(command):
+    cmd = os.popen(command)
+    line = cmd.read()
+    cmd.close()
+    return line.strip()
 
 class ServiceAdvertisement(Advertisement):
     def __init__(self, index):
@@ -69,9 +75,12 @@ class TimeCharacteristic(Characteristic):
         self.add_descriptor(TimeDescriptor(self))
 
     def get_time(self):
+        global config
+
         value = []
+
         
-        if dateFormat == 1:
+        if config['dateFormat'] == 1:
             pdate = os.popen("date '+%I:%M %p %Z'")
         else:
             pdate = os.popen("date '+%H:%M %Z'")
@@ -244,9 +253,35 @@ class UnitDescriptor(Descriptor):
 
         return value
 
-#:########################:#
+#:############:#
+def readConfig():
+#:############:#
+    global config
+
+    configFile = configPath+"/config.json"
+
+    if os.path.exists(configFile):
+        print("reading config....")
+        with open(configFile) as json_file:
+            config = json.load(json_file)
+    else:
+        config = {
+            'dateFormat': 1
+        }
+        os.makedirs(configPath, exist_ok=True)
+        with open(configFile, 'w') as outfile:
+            outfile.write(json.dumps(config))
+
+    return
+
+
+#:############:#
 #:#         Main         #:#
-#:########################:#
+#:############:#
+
+logname=os.getlogin()
+home=execOne("awk -F: '{if($1==\""+logname+"\")print $6}' /etc/passwd")
+configPath = home+"/.config/piclock"
 
 app = Application()
 app.add_service(ClockService(0))
@@ -255,6 +290,8 @@ app.register()
 adv = ServiceAdvertisement(0)
 adv.register()
 
+readConfig()
+print("dateFormat: "+str(config['dateFormat']))
 try:
     app.run()
 except KeyboardInterrupt:
