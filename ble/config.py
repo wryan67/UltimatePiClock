@@ -3,8 +3,10 @@ import os
 import json
 import util
 
-logname=os.getlogin()
+from  settings import Settings
 
+logname=os.getlogin()
+settings = Settings()
 
 #:############:#
 def getHome():
@@ -16,24 +18,25 @@ def getConfigPath():
 #:############:#
     return getHome()+"/.config/piclock"
 
-
 #:############:#
 def readConfig():
 #:############:#
+    global settings
+
     configFile = getConfigPath()+"/config.json"
 
     if os.path.exists(configFile):
-        print("reading config....")
+        print("reading config<"+configFile+">....")
         with open(configFile) as json_file:
-            config = json.load(json_file)
+            settings = Settings(**json.load(json_file))
     else:
-        config = {
-            'dateFormat': 1
-        }
+        print("creating config<"+configFile+">....")
         os.makedirs(getConfigPath(), exist_ok=True)
+        print(settings.toJson())
         with open(configFile, 'w') as outfile:
-            outfile.write(json.dumps(config))
+            outfile.write(settings.toJson())
 
-    return config
+    return
 
-settings=readConfig()
+
+readConfig()

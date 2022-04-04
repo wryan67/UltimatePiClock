@@ -20,7 +20,7 @@ class TimeCharacteristic(Characteristic):
     def get_time(self):
         value = []
 
-        if config.settings['dateFormat'] == 1:
+        if config.settings['timeFormat'] == 1:
             cmd = "date '+%I:%M %p %Z'"
         else:
             cmd = "date '+%H:%M %Z'"
