@@ -5,28 +5,19 @@ from common import JsonConversionType, PrettyPrint
 
 from  settings import Settings
 
-logname=os.getlogin()
-settings: Settings
-
 class Config:
 
-    #:############:#
     @staticmethod
     def getHome():
-    #:############:#
-        return util.execOne("awk -F: '{if($1==\"" + logname + "\")print $6}' /etc/passwd")
+        return util.execOne("awk -F: '{if($1==\"" + os.getlogin() + "\")print $6}' /etc/passwd")
 
-    #:############:#
     @staticmethod
     def getConfigPath():
-    #:############:#
         return Config.getHome()+"/.config/piclock"
 
-    #:############:#
     @staticmethod
     def readConfig():
-    #:############:#
-        global settings
+        settings: Settings
         configFile = Config.getConfigPath()+"/config.json"
 
         if os.path.exists(configFile):
@@ -40,3 +31,4 @@ class Config:
             with open(configFile, 'w') as outfile:
                 outfile.write(settings.toJson())
 
+        return settings

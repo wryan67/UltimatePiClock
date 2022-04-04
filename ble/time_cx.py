@@ -2,15 +2,15 @@
 import dbus
 import common
 import util
-import config
 
-from service import Characteristic, Descriptor
-
+from service  import Characteristic, Descriptor
+from settings import Settings
 
 class TimeCharacteristic(Characteristic):
 
-    def __init__(self, service):
+    def __init__(self, service, settings: Settings):
         self.notifying = False
+        self.settings  = settings
 
         Characteristic.__init__(
             self, common.TIME_CHARACTERISTIC_UUID,
@@ -21,12 +21,12 @@ class TimeCharacteristic(Characteristic):
 
         value = []
 
-        if config.settings.timeFormat == 1:
+        if self.settings.timeFormat == 1:
             cmd = "date '+%I:%M %p %Z'"
         else:
             cmd = "date '+%H:%M %Z'"
 
-        # cmd="date +%H:%M"
+        cmd="date +%H:%M"
 
         now = util.execOne(cmd)
 

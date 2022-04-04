@@ -21,7 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import config
+import common
+from config import Config
 from settings import Settings
 
 from advertisement import Advertisement
@@ -39,14 +40,13 @@ class ServiceAdvertisement(Advertisement):
         self.include_tx_power = True
 
 class ClockService(Service):
-    CLOCK_SVC_UUID = "00000001-9233-face-8d75-3e5b444bc3cf"
 
-    def __init__(self, index):
+    def __init__(self, index, settings):
         self.fahrenheit = False
 
+        Service.__init__(self, index, common.CLOCK_SVC_UUID, True)
 
-        Service.__init__(self, index, self.CLOCK_SVC_UUID, True)
-        self.add_characteristic(time_cx.TimeCharacteristic(self))
+        self.add_characteristic(time_cx.TimeCharacteristic(self,settings))
         self.add_characteristic(temperature_cx.TempCharacteristic(self))
         self.add_characteristic(unit_cx.UnitCharacteristic(self))
 
@@ -57,20 +57,21 @@ class ClockService(Service):
         self.fahrenheit = fahrenheit
 
 
+
 #:########################:#
 #:#         Main         #:#
 #:########################:#
 
-config.Config.readConfig()
+settings = Config.readConfig()
 
 app = Application()
-app.add_service(ClockService(0))
+app.add_service(ClockService(0,settings))
 app.register()
 
 adv = ServiceAdvertisement(0)
 adv.register()
 
-print("Settings: " + config.settings.toJson())
+print("Settings: " + settings.toJson())
 
 try:
     app.run()
