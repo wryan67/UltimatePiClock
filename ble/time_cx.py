@@ -18,6 +18,7 @@ class TimeCharacteristic(Characteristic):
         self.add_descriptor(TimeDescriptor(self))
 
     def get_time(self):
+
         value = []
 
         if config.settings.timeFormat == 1:

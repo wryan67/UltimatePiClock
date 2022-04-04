@@ -22,6 +22,7 @@ SOFTWARE.
 """
 
 import config
+from settings import Settings
 
 from advertisement import Advertisement
 from service import Application, Service
@@ -60,6 +61,7 @@ class ClockService(Service):
 #:#         Main         #:#
 #:########################:#
 
+config.Config.readConfig()
 
 app = Application()
 app.add_service(ClockService(0))
@@ -67,7 +69,6 @@ app.register()
 
 adv = ServiceAdvertisement(0)
 adv.register()
-
 
 print("Settings: " + config.settings.toJson())
 

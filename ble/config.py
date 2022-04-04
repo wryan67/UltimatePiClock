@@ -8,7 +8,7 @@ from  settings import Settings
 logname=os.getlogin()
 settings: Settings
 
-class config:
+class Config:
 
     #:############:#
     @staticmethod
@@ -20,14 +20,14 @@ class config:
     @staticmethod
     def getConfigPath():
     #:############:#
-        return config.getHome()+"/.config/piclock"
+        return Config.getHome()+"/.config/piclock"
 
     #:############:#
     @staticmethod
     def readConfig():
     #:############:#
         global settings
-        configFile = config.getConfigPath()+"/config.json"
+        configFile = Config.getConfigPath()+"/config.json"
 
         if os.path.exists(configFile):
             print("reading config<"+configFile+">...")
@@ -35,10 +35,8 @@ class config:
                 settings = Settings.fromJson(configFile,JsonConversionType.file)
         else:
             print("creating config<"+configFile+">...")
-            os.makedirs(config.getConfigPath(), exist_ok=True)
+            os.makedirs(Config.getConfigPath(), exist_ok=True)
             print(settings.toJson())
             with open(configFile, 'w') as outfile:
                 outfile.write(settings.toJson())
 
-
-config.readConfig()
