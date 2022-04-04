@@ -17,8 +17,11 @@ class UnitCharacteristic(Characteristic):
         val = str(value[0]).upper()
         if val == "C":
             self.settings.unitType='C'
+            self.settings.update()
+
         elif val == "F":
             self.settings.unitType='F'
+            self.settings.update()
 
     def ReadValue(self, options):
         value = []
