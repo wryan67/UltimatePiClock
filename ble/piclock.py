@@ -22,16 +22,15 @@ SOFTWARE.
 """
 
 import common
-from config import Config
 from settings import Settings
 
 from advertisement import Advertisement
 from service import Application, Service
 
-import time_cx
-import temperature_cx
-import unit_cx
-
+from time_cx        import TimeCharacteristic
+from temperature_cx import TempCharacteristic
+from unit_cx        import UnitCharacteristic
+from format_cx      import FormatCharacteristic
 
 class ServiceAdvertisement(Advertisement):
     def __init__(self, index):
@@ -41,14 +40,15 @@ class ServiceAdvertisement(Advertisement):
 
 class ClockService(Service):
 
-    def __init__(self, index, settings):
+    def __init__(self, index, settings: Settings):
         self.fahrenheit = False
 
         Service.__init__(self, index, common.CLOCK_SVC_UUID, True)
 
-        self.add_characteristic(time_cx.TimeCharacteristic(self,settings))
-        self.add_characteristic(temperature_cx.TempCharacteristic(self))
-        self.add_characteristic(unit_cx.UnitCharacteristic(self))
+        self.add_characteristic(TimeCharacteristic(self,settings))
+        self.add_characteristic(FormatCharacteristic(self,settings))
+        self.add_characteristic(TempCharacteristic(self))
+        self.add_characteristic(UnitCharacteristic(self))
 
     def is_fahrenheit(self):
         return self.fahrenheit
@@ -62,7 +62,7 @@ class ClockService(Service):
 #:#         Main         #:#
 #:########################:#
 
-settings = Config.readConfig()
+settings = Settings.readConfig()
 
 app = Application()
 app.add_service(ClockService(0,settings))

@@ -1,14 +1,14 @@
 
 import common
 import dbus
-import config
 
-from service import Characteristic, Descriptor
-
+from service  import Characteristic, Descriptor
+from settings import Settings
 
 class FormatCharacteristic(Characteristic):
 
-    def __init__(self, service):
+    def __init__(self, service, settings: Settings):
+        self.settings=settings
         Characteristic.__init__(
                 self, common.FORMAT_CHARACTERISTIC_UUID,
                 ["read", "write"], service)
@@ -17,21 +17,21 @@ class FormatCharacteristic(Characteristic):
     def WriteValue(self, value, options):
         val = str(value[0]).upper()
         if val == "1":
-            config.settings.timeFormat = 1
+            self.settings.timeFormat = 1
+            self.settings.update()
         elif val == "2":
-            config.settings.timeFormat = 2
+            self.settings.timeFormat = 2
+            self.settings.update()
 
     def ReadValue(self, options):
         value = []
 
-        if self.service.is_fahrenheit(): val = "F"
-        else: val = "C"
-        value.append(dbus.Byte(val.encode()))
+        value.append(dbus.Byte(0x30+self.settings.timeFormat))
 
         return value
 
 class FormatDescriptor(Descriptor):
-    FORMAT_DESCRIPTOR_VALUE = "Temperature Formats (F or C)"
+    FORMAT_DESCRIPTOR_VALUE = "Time Formats (1 or 2)"
 
     def __init__(self, characteristic):
         Descriptor.__init__(

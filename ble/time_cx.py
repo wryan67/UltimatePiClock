@@ -26,7 +26,7 @@ class TimeCharacteristic(Characteristic):
         else:
             cmd = "date '+%H:%M %Z'"
 
-        cmd="date +%H:%M"
+        # cmd="date +%H:%M"
 
         now = util.execOne(cmd)
 
