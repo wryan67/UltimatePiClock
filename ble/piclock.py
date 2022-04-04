@@ -56,12 +56,9 @@ class ClockService(Service):
         self.fahrenheit = fahrenheit
 
 
-
-
-
-#:############:#
+#:########################:#
 #:#         Main         #:#
-#:############:#
+#:########################:#
 
 
 app = Application()
@@ -72,7 +69,7 @@ adv = ServiceAdvertisement(0)
 adv.register()
 
 
-print("timeFormat: " + str(config.settings.timeFormat))
+print("Settings: " + config.settings.toJson())
 
 try:
     app.run()

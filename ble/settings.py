@@ -10,11 +10,11 @@ class Settings(object):
                  timezone:   str='Central'
                 ):
 
-        self.unitType = unitType
+        self.unitType   = unitType
         self.timeFormat = timeFormat
         self.timezone   = timezone
 
-    def toJson(self, prettyPrint:PrettyPrint=PrettyPrint.false):
+    def toJson(self, prettyPrint:PrettyPrint=PrettyPrint.true):
         if prettyPrint == PrettyPrint.true:
             return json.dumps(self, default=lambda o: o.__dict__, indent=4)
         else:
@@ -31,10 +31,6 @@ class Settings(object):
             inputFile.close()
 
         thisDict=json.loads(jsonString)
-        return Settings(thisDict)
-
-settings = Settings.fromJson("settings.json", JsonConversionType.file)
+        return Settings(**thisDict)
 
 
-
-print("timeFormat="+str(settings.timeFormat))

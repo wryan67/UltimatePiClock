@@ -1,42 +1,44 @@
 
 import os
-import json
 import util
+from common import JsonConversionType, PrettyPrint
 
 from  settings import Settings
 
 logname=os.getlogin()
-settings = Settings()
+settings: Settings
 
-#:############:#
-def getHome():
-#:############:#
-    return util.execOne("awk -F: '{if($1==\"" + logname + "\")print $6}' /etc/passwd")
+class config:
 
-#:############:#
-def getConfigPath():
-#:############:#
-    return getHome()+"/.config/piclock"
+    #:############:#
+    @staticmethod
+    def getHome():
+    #:############:#
+        return util.execOne("awk -F: '{if($1==\"" + logname + "\")print $6}' /etc/passwd")
 
-#:############:#
-def readConfig():
-#:############:#
-    global settings
+    #:############:#
+    @staticmethod
+    def getConfigPath():
+    #:############:#
+        return config.getHome()+"/.config/piclock"
 
-    configFile = getConfigPath()+"/config.json"
+    #:############:#
+    @staticmethod
+    def readConfig():
+    #:############:#
+        global settings
+        configFile = config.getConfigPath()+"/config.json"
 
-    if os.path.exists(configFile):
-        print("reading config<"+configFile+">....")
-        with open(configFile) as json_file:
-            settings = Settings(**json.load(json_file))
-    else:
-        print("creating config<"+configFile+">....")
-        os.makedirs(getConfigPath(), exist_ok=True)
-        print(settings.toJson())
-        with open(configFile, 'w') as outfile:
-            outfile.write(settings.toJson())
-
-    return
+        if os.path.exists(configFile):
+            print("reading config<"+configFile+">...")
+            with open(configFile) as json_file:
+                settings = Settings.fromJson(configFile,JsonConversionType.file)
+        else:
+            print("creating config<"+configFile+">...")
+            os.makedirs(config.getConfigPath(), exist_ok=True)
+            print(settings.toJson())
+            with open(configFile, 'w') as outfile:
+                outfile.write(settings.toJson())
 
 
-readConfig()
+config.readConfig()
