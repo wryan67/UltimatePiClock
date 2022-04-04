@@ -41,21 +41,12 @@ class ServiceAdvertisement(Advertisement):
 class ClockService(Service):
 
     def __init__(self, index, settings: Settings):
-        self.fahrenheit = False
-
         Service.__init__(self, index, common.CLOCK_SVC_UUID, True)
 
         self.add_characteristic(TimeCharacteristic(self,settings))
         self.add_characteristic(FormatCharacteristic(self,settings))
         self.add_characteristic(TempCharacteristic(self))
         self.add_characteristic(UnitCharacteristic(self))
-
-    def is_fahrenheit(self):
-        return self.fahrenheit
-
-    def set_fahrenheit(self, fahrenheit):
-        self.fahrenheit = fahrenheit
-
 
 
 #:########################:#

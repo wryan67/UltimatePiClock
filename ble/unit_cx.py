@@ -16,16 +16,14 @@ class UnitCharacteristic(Characteristic):
     def WriteValue(self, value, options):
         val = str(value[0]).upper()
         if val == "C":
-            self.service.set_fahrenheit(False)
+            self.settings.unitType='C'
         elif val == "F":
-            self.service.set_fahrenheit(True)
+            self.settings.unitType='F'
 
     def ReadValue(self, options):
         value = []
 
-        if self.service.is_fahrenheit(): val = "F"
-        else: val = "C"
-        value.append(dbus.Byte(val.encode()))
+        value.append(dbus.Byte(self.settings.unitType.encode()))
 
         return value
 
