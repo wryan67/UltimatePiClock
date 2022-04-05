@@ -98,8 +98,9 @@ bool usage() {
     fprintf(stderr, "s = marquee speed (ms)\n");
     fprintf(stderr, "f = clock format\n");
     fprintf(stderr, "p = picture filename\n");
-    fprintf(stderr, "    1 - Weekday Month Date HH24:SS\n");
-    fprintf(stderr, "    2 - Weekday Date  HH:SS AM/PM\n");
+    fprintf(stderr, "    Date formats:\n");
+    fprintf(stderr, "    1 - Weekday Date  HH:MM AM/PM\n");
+    fprintf(stderr, "    2 - Weekday Month Date HH24:MM\n");
 
     return false;
 }
@@ -250,7 +251,7 @@ void updateClock(Image &image) {
     char vtime[64];
 
     switch (dateFormat) {
-    case '2':	std::strftime(vtime, 64, "%a %e  %I:%M %p", std::localtime(&end_time));
+    case '1':	std::strftime(vtime, 64, "%a %e  %I:%M %p", std::localtime(&end_time));
         break;
     default:
         if (std::localtime(&end_time)->tm_mday < 10) {
