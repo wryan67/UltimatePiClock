@@ -63,6 +63,8 @@ struct ContentView: View {
     @State var tempCharacteristic : Characteristic?
     @State var unitCharacteristic : Characteristic?
     @State var timeCharacteristic : Characteristic?
+    @State var formatCharacteristic : Characteristic?
+    @State var timezoneCharacteristic : Characteristic?
 
     @State var hostname = Text("Hostname: unknown")
     @State var units = TemperatureUnitType.celsius
@@ -117,6 +119,8 @@ struct ContentView: View {
                                         Text(value.localizedName).tag(value)
                                     }
                                 }.pickerStyle(.segmented)
+                                    .onChange(of: timeFormat,
+                                              perform: {(value) in modifyTimeFormat()})
                             }
                         }
                         
@@ -155,6 +159,31 @@ struct ContentView: View {
         print(msg)
         piTime = Text(msg)
     }
+
+    
+    func modifyTimeFormat() {
+        print("user clicked time format: \(timeFormat.rawValue)")
+        var format: String
+
+        if (timeFormat==TimeFormat.hour12) {
+            format="2"
+        } else {
+            format="1"
+        }
+
+        
+        if (peripheral != nil) {
+            print("modifying format characteristic: "+format)
+                       
+            let writeFuture = self.formatCharacteristic?.write(data:format.data(using: .ascii)!)
+
+            writeFuture?.onSuccess(completion: { (_) in
+                readTime()
+            })
+            
+        }
+    }
+    
     
     func readTime(){
         //read a value from the characteristic
@@ -172,6 +201,40 @@ struct ContentView: View {
             message(msg: "read error")
         }
     }
+
+    func readFormat(){
+        if (peripheral != nil) {
+            guard let discoveredPeripheral = peripheral else {
+                print("e602: unknown error")
+                return
+            }
+            guard let dataCharacteristic = discoveredPeripheral.services(withUUID:ClockService.serviceCBUUID)?.first?.characteristics(withUUID:ClockService.formatCharacteristicCBUUID)?.first else {
+                print("e605 format characteristic not found")
+                return
+            }
+            formatCharacteristic = dataCharacteristic
+        }
+        
+        
+        //read a value from the characteristic
+        let readFuture = self.formatCharacteristic?.read(timeout: 5)
+        readFuture?.onSuccess { (_) in
+            //the value is in the dataValue property
+            
+            let s = String(data:(self.formatCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+            
+            DispatchQueue.main.async {
+                print("current time format="+s)
+                if (s=="1") {
+                    timeFormat = TimeFormat.hour24
+                } else {
+                    timeFormat = TimeFormat.hour12
+                }
+            }
+        }
+    }
+
+    
     
     func activate() {
         message(msg: "Activating...")
@@ -302,6 +365,7 @@ struct ContentView: View {
 //                self.characteristicView.isHidden = false
 //            }
             //read the data from the characteristic
+            self.readFormat()
             self.readTime()
             //Ask the characteristic to start notifying for value change
             return dataCharacteristic.startNotifying()

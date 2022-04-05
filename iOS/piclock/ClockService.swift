@@ -22,12 +22,16 @@ public struct ClockService {
     public static let tempCharacteristicCBUUID = CBUUID(string:tempCharacteristicUUID)
     public static let unitCharacteristicCBUUID = CBUUID(string:unitCharacteristicUUID)
     public static let timeCharacteristicCBUUID = CBUUID(string:timeCharacteristicUUID)
+    public static let formatCharacteristicCBUUID = CBUUID(string:formatCharacteristicUUID)
+    public static let timezoneCharacteristicCBUUID = CBUUID(string:timezoneCharacteristicUUID)
 
     
     public static let characteristics = [
         timeCharacteristicCBUUID,
         tempCharacteristicCBUUID,
-        unitCharacteristicCBUUID
+        unitCharacteristicCBUUID,
+        formatCharacteristicCBUUID,
+        timezoneCharacteristicCBUUID
     ]
     
 }
