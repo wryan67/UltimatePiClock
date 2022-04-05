@@ -7,13 +7,56 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8419F33827FBBCF6002A75D1 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8419F33727FBBCF6002A75D1 /* CoreLocation.framework */; };
+		8419F33A27FBBCFF002A75D1 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8419F33927FBBCFF002A75D1 /* CoreBluetooth.framework */; };
+		8419F33B27FBBD2F002A75D1 /* BlueCapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 848BF8AE27FBB9FA0066DC3F /* BlueCapKit.framework */; };
+		8419F33C27FBBD2F002A75D1 /* BlueCapKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 848BF8AE27FBB9FA0066DC3F /* BlueCapKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8419F33F27FBBE6B002A75D1 /* TemperatureUnitType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419F33E27FBBE6B002A75D1 /* TemperatureUnitType.swift */; };
+		848BF8A827FBB7180066DC3F /* ClockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848BF8A727FBB7180066DC3F /* ClockService.swift */; };
 		84A6E62527F5294600D24BDD /* piclockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A6E62427F5294600D24BDD /* piclockApp.swift */; };
 		84A6E62727F5294600D24BDD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A6E62627F5294600D24BDD /* ContentView.swift */; };
 		84A6E62927F5294C00D24BDD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84A6E62827F5294C00D24BDD /* Assets.xcassets */; };
 		84A6E62C27F5294C00D24BDD /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84A6E62B27F5294C00D24BDD /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		8419F33227FBBCC7002A75D1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 848BF8A927FBB9FA0066DC3F /* BlueCapKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 0551208119F5506000ED3B74;
+			remoteInfo = BlueCapKit;
+		};
+		848BF8AD27FBB9FA0066DC3F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 848BF8A927FBB9FA0066DC3F /* BlueCapKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0551208219F5506000ED3B74;
+			remoteInfo = BlueCapKit;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8419F33D27FBBD2F002A75D1 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				8419F33C27FBBD2F002A75D1 /* BlueCapKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		8419F33727FBBCF6002A75D1 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		8419F33927FBBCFF002A75D1 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		8419F33E27FBBE6B002A75D1 /* TemperatureUnitType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemperatureUnitType.swift; sourceTree = "<group>"; };
+		846CFEB927FBE1EC00BE2380 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		848BF8A727FBB7180066DC3F /* ClockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockService.swift; sourceTree = "<group>"; };
+		848BF8A927FBB9FA0066DC3F /* BlueCapKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BlueCapKit.xcodeproj; path = BlueCap/BlueCapKit.xcodeproj; sourceTree = "<group>"; };
 		84A6E62127F5294600D24BDD /* piclock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = piclock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84A6E62427F5294600D24BDD /* piclockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = piclockApp.swift; sourceTree = "<group>"; };
 		84A6E62627F5294600D24BDD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -26,17 +69,39 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8419F33A27FBBCFF002A75D1 /* CoreBluetooth.framework in Frameworks */,
+				8419F33B27FBBD2F002A75D1 /* BlueCapKit.framework in Frameworks */,
+				8419F33827FBBCF6002A75D1 /* CoreLocation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8419F33527FBBCEA002A75D1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8419F33927FBBCFF002A75D1 /* CoreBluetooth.framework */,
+				8419F33727FBBCF6002A75D1 /* CoreLocation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		848BF8AA27FBB9FA0066DC3F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				848BF8AE27FBB9FA0066DC3F /* BlueCapKit.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		84A6E61827F5294600D24BDD = {
 			isa = PBXGroup;
 			children = (
+				848BF8A927FBB9FA0066DC3F /* BlueCapKit.xcodeproj */,
 				84A6E62327F5294600D24BDD /* piclock */,
 				84A6E62227F5294600D24BDD /* Products */,
+				8419F33527FBBCEA002A75D1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -51,8 +116,11 @@
 		84A6E62327F5294600D24BDD /* piclock */ = {
 			isa = PBXGroup;
 			children = (
+				846CFEB927FBE1EC00BE2380 /* Info.plist */,
 				84A6E62427F5294600D24BDD /* piclockApp.swift */,
 				84A6E62627F5294600D24BDD /* ContentView.swift */,
+				848BF8A727FBB7180066DC3F /* ClockService.swift */,
+				8419F33E27FBBE6B002A75D1 /* TemperatureUnitType.swift */,
 				84A6E62827F5294C00D24BDD /* Assets.xcassets */,
 				84A6E62A27F5294C00D24BDD /* Preview Content */,
 			);
@@ -77,10 +145,12 @@
 				84A6E61D27F5294600D24BDD /* Sources */,
 				84A6E61E27F5294600D24BDD /* Frameworks */,
 				84A6E61F27F5294600D24BDD /* Resources */,
+				8419F33D27FBBD2F002A75D1 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				8419F33327FBBCC7002A75D1 /* PBXTargetDependency */,
 			);
 			name = piclock;
 			productName = piclock;
@@ -113,12 +183,28 @@
 			mainGroup = 84A6E61827F5294600D24BDD;
 			productRefGroup = 84A6E62227F5294600D24BDD /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 848BF8AA27FBB9FA0066DC3F /* Products */;
+					ProjectRef = 848BF8A927FBB9FA0066DC3F /* BlueCapKit.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				84A6E62027F5294600D24BDD /* piclock */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		848BF8AE27FBB9FA0066DC3F /* BlueCapKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = BlueCapKit.framework;
+			remoteRef = 848BF8AD27FBB9FA0066DC3F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		84A6E61F27F5294600D24BDD /* Resources */ = {
@@ -137,12 +223,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8419F33F27FBBE6B002A75D1 /* TemperatureUnitType.swift in Sources */,
+				848BF8A827FBB7180066DC3F /* ClockService.swift in Sources */,
 				84A6E62727F5294600D24BDD /* ContentView.swift in Sources */,
 				84A6E62527F5294600D24BDD /* piclockApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8419F33327FBBCC7002A75D1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = BlueCapKit;
+			targetProxy = 8419F33227FBBCC7002A75D1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		84A6E62D27F5294C00D24BDD /* Debug */ = {
@@ -270,6 +366,7 @@
 				DEVELOPMENT_TEAM = N78PB6ZZ5Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = piclock/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -299,6 +396,7 @@
 				DEVELOPMENT_TEAM = N78PB6ZZ5Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = piclock/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
