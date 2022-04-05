@@ -15,14 +15,21 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <dirent.h>
+#include <jsoncpp/json/json.h>
 
 #include <chrono>
 #include <ctime>  
+#include <iostream>
+#include <fstream>
+#include <vector>
 
 #include <udd.h>
 #include <bme280rpi.h>
 
 #include "./tools/include/threads.h"
+
+using namespace std;
+using namespace udd;
 
 int marquee = 0;
 int innerStep = 16;
@@ -38,7 +45,6 @@ enum ProcessLocks {
 };
 
  // Display vars
-using namespace udd;
 
 DisplayConfigruation d1Config;
 DisplayST7789R d1 = DisplayST7789R();
@@ -366,8 +372,6 @@ void updateClock(Image &image) {
     }
 }
 
-#include <vector>
-using namespace std;
 vector<char *> pictureFiles;
 
 void updateFileList() {
@@ -512,6 +516,27 @@ int main(int argc, char **argv)
 	if (!commandLineOptions(argc, argv)) {
 		return 1;
 	}
+
+     char configFilename[512];
+     sprintf(configFilename,"%s/.config/piclock/config.json", getenv("HOME"));
+     printf("reading config<%s>...\n", configFilename);
+
+     Json::Value config;
+     std::ifstream configFile(configFilename);
+   
+    Json::Reader reader;
+    bool parsingSuccessful = reader.parse( configFile, config, false );
+    if ( !parsingSuccessful ) {
+        // report to the user the failure and their locations in the document.
+        std::cout  << reader.getFormatedErrorMessages() << "\n";
+        exit(2);
+    } else {
+        auto timeFormat=config["timeFormat"].asString();
+        if (timeFormat.length()>0) {
+           dateFormat=timeFormat.c_str()[0];
+        }
+    }
+
 
 	if (!setup()) {
 		printf("setup failed\n");

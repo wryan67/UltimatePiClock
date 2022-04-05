@@ -1,6 +1,6 @@
 
 SRC = src/tools/util/threads.cpp src/main.cpp 
-LIBS = -lpthread -lwiringPi -lwiringPiBME280rpi -lNeoPixelRPi
+LIBS = -lpthread -lwiringPi -lwiringPiBME280rpi -lNeoPixelRPi -ljsoncpp
 SLIB = /usr/local/lib/libwiringPiUDDrpi.a
 
 piClock: ${SRC}
