@@ -528,7 +528,7 @@ int main(int argc, char **argv)
     bool parsingSuccessful = reader.parse( configFile, config, false );
     if ( !parsingSuccessful ) {
         // report to the user the failure and their locations in the document.
-        std::cout  << reader.getFormatedErrorMessages() << "\n";
+        std::cout  << reader.getFormattedErrorMessages() << "\n";
         exit(2);
     } else {
         auto timeFormat=config["timeFormat"].asString();
