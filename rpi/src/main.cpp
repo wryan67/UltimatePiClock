@@ -156,11 +156,8 @@ bool setup() {
 bool commandLineOptions(int argc, char **argv) {
 	int c, index;
 
-	if (argc < 2) {
-		return usage();
-	}
 
-	while ((c = getopt(argc, argv, "db:f:i:m:p:r:s:")) != -1)
+	while ((c = getopt(argc, argv, "db:i:m:p:r:s:")) != -1)
 		switch (c) {
 		case 'd':
 			daemonMode = true;
@@ -180,9 +177,6 @@ bool commandLineOptions(int argc, char **argv) {
             break;
         case 's':
 			sscanf(optarg, "%d", &marqueeSpeed);
-			break;
-		case 'f':
-			dateFormat = optarg[0];
 			break;
         case 'p':
             pictureFolderName = optarg;
@@ -517,18 +511,17 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-     char configFilename[512];
-     sprintf(configFilename,"%s/.config/piclock/config.json", getenv("HOME"));
-     printf("reading config<%s>...\n", configFilename);
+    char configFilename[512];
+    sprintf(configFilename,"%s/.config/piclock/config.json", getenv("HOME"));
+    printf("reading config<%s>...\n", configFilename);
 
-     Json::Value config;
-     std::ifstream configFile(configFilename);
+    Json::Value config;
+    ifstream configFile(configFilename);
    
     Json::Reader reader;
     bool parsingSuccessful = reader.parse( configFile, config, false );
     if ( !parsingSuccessful ) {
-        // report to the user the failure and their locations in the document.
-        std::cout  << reader.getFormattedErrorMessages() << "\n";
+        cout  << reader.getFormattedErrorMessages() << endl;
         exit(2);
     } else {
         auto timeFormat=config["timeFormat"].asString();
