@@ -31,6 +31,7 @@ from time_cx        import TimeCharacteristic
 from temperature_cx import TempCharacteristic
 from unit_cx        import UnitCharacteristic
 from format_cx      import FormatCharacteristic
+from timezone_cx    import TimezoneCharacteristic
 
 class ServiceAdvertisement(Advertisement):
     def __init__(self, index):
@@ -43,10 +44,11 @@ class ClockService(Service):
     def __init__(self, index, settings: Settings):
         Service.__init__(self, index, common.CLOCK_SVC_UUID, True)
 
-        self.add_characteristic(TimeCharacteristic(self,settings))
-        self.add_characteristic(FormatCharacteristic(self,settings))
         self.add_characteristic(TempCharacteristic(self))
         self.add_characteristic(UnitCharacteristic(self))
+        self.add_characteristic(TimeCharacteristic(self,settings))
+        self.add_characteristic(FormatCharacteristic(self,settings))
+        self.add_characteristic(TimezoneCharacteristic(self,settings))
 
 
 #:########################:#
