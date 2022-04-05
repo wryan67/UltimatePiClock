@@ -26,8 +26,8 @@ public enum TimeType: String, CaseIterable {
 }
 
 public enum TimeFormat: String, CaseIterable {
-    case hour12 = "24-Hour"
     case hour24 = "12-Hour"
+    case hour12 = "24-Hour"
 
     var localizedName: LocalizedStringKey { LocalizedStringKey(rawValue)}
 }
