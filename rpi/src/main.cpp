@@ -28,7 +28,7 @@
 #include <bme280rpi.h>
 
 
-#include "./tools/include/threads.h"
+#include "threads.h"
 #include "Settings.h"
 #include "ClockListener.h"
 

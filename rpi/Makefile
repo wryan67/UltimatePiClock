@@ -1,6 +1,6 @@
 
 INCLUDE = -I src -I src/tools/include
-SRC = src/tools/util/threads.cpp src/main.cpp 
+SRC  = src/main.cpp 
 LIBS = -lpthread -lwiringPi -lwiringPiBME280rpi -lNeoPixelRPi -ljsoncpp -llog4pi
 SLIB = /usr/local/lib/libwiringPiUDDrpi.a
 OBJS = obj/Settings.o obj/ClockClient.o obj/StringUtil.o obj/tcpclient.o obj/threads.o obj/HttpRequest.o obj/tcplistener.o obj/ClockListener.o
