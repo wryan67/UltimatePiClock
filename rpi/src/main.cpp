@@ -23,13 +23,19 @@
 #include <fstream>
 #include <vector>
 
+#include <log4pi.h>
 #include <udd.h>
 #include <bme280rpi.h>
 
+
 #include "./tools/include/threads.h"
+#include "Settings.h"
+#include "ClockListener.h"
 
 using namespace std;
 using namespace udd;
+using namespace common::utility;
+using namespace piclock;
 
 int marquee = 0;
 int innerStep = 16;
@@ -38,6 +44,7 @@ int marqueeSpeed = 100;
 char lastTopMessage[128] = { 0 };
 const char* pictureFolderName = "~/Pictures/clock/";
  
+Logger logger{"main"};
 
 
 enum ProcessLocks {
@@ -65,7 +72,6 @@ int bme280_fd;
 
 // Global Variables
 static long         spiSpeed = 90000000;
-static char         dateFormat = '1';
 
 static volatile bool daemonMode = false;
 static volatile float humidity = -9999;
@@ -84,14 +90,6 @@ int   imagePipes[2];
 
 
 
-unsigned long long currentTimeMillis() {
-    struct timeval currentTime;
-    gettimeofday(&currentTime, NULL);
-
-    return
-        (unsigned long long)(currentTime.tv_sec) * 1000 +
-        (unsigned long long)(currentTime.tv_usec) / 1000;
-}
 
 
 bool usage() {
@@ -250,7 +248,7 @@ void updateClock(Image &image) {
     std::time_t end_time = std::chrono::system_clock::to_time_t(now);
     char vtime[64];
 
-    switch (dateFormat) {
+    switch (settings.dateFormat) {
     case '1':	std::strftime(vtime, 64, "%a %e  %I:%M %p", std::localtime(&end_time));
         break;
     default:
@@ -526,15 +524,21 @@ int main(int argc, char **argv)
     } else {
         auto timeFormat=config["timeFormat"].asString();
         if (timeFormat.length()>0) {
-           dateFormat=timeFormat.c_str()[0];
+           settings.dateFormat=timeFormat.c_str()[0];
         }
     }
-
 
 	if (!setup()) {
 		printf("setup failed\n");
 		return 1;
 	}
+
+    ClockListener listener;
+    listener.start();
+    logger.info("now accepting requests on port %d", settings.servicePort);
+
+
+
     d1.clearScreen(DARK_BLUE);
 
     printf("bme280_address=%02x\n", bme280_address);

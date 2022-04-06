@@ -66,11 +66,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\tools\util\stringUtil.cpp" />
+    <ClCompile Include="src\tools\util\StringUtil.cpp" />
     <ClCompile Include="src\tools\util\threads.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\tools\include\stringUtil.h" />
+    <ClInclude Include="src\tools\include\StringUtil.h" />
     <ClInclude Include="src\tools\include\threads.h" />
   </ItemGroup>
   <ItemGroup>
