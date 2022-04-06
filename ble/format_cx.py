@@ -1,6 +1,8 @@
 
-import common
 import dbus
+import requests
+
+import common
 
 from service  import Characteristic, Descriptor
 from settings import Settings
@@ -19,9 +21,11 @@ class FormatCharacteristic(Characteristic):
         if val == "1":
             self.settings.timeFormat = 1
             self.settings.update()
+            rs=requests.post("http://localhost:8080/timeFormat", data = "1")
         elif val == "2":
             self.settings.timeFormat = 2
             self.settings.update()
+            rs=requests.post("http://localhost:8080/timeFormat", data = "2")
 
     def ReadValue(self, options):
         value = []
