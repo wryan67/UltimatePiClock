@@ -3,6 +3,7 @@
 #include "ClockClient.h"
 #include "StringUtil.h"
 #include <stdio.h>
+#include "Settings.h"
 
 #include <iostream>
 #include <fstream>
@@ -115,6 +116,14 @@ namespace piclock {
                 logger->info("hello");
                 body="hello there!";
                 status=false;
+            } else if (!request.path.compare("/timeFormat")) {
+                if (strstr(request.body.c_str(),"1")) {
+                    settings.dateFormat='1';
+                    body="{\"timeFormat\":\"1\"}";
+                } else {
+                    settings.dateFormat='2';
+                    body="{\"timeFormat\":\"2\"}";
+                }
             } else {
                 return notFound(request, dateTimeGMT);
             }
