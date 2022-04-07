@@ -9,12 +9,14 @@ class Settings(object):
     def __init__(self,
                  unitType:   str='C',
                  timeFormat: int=1,
-                 timezone:   str='Central'
+                 timezone:   str='Central',
+                 isAutoUpdate: str='U'
                 ):
 
-        self.unitType   = unitType
-        self.timeFormat = timeFormat
-        self.timezone   = timezone
+        self.unitType     = unitType
+        self.timeFormat   = timeFormat
+        self.timezone     = timezone
+        self.isAutoUpdate = isAutoUpdate
 
 
     def toJson(self, prettyPrint:PrettyPrint=PrettyPrint.true):
