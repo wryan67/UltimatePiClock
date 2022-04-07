@@ -1,12 +1,13 @@
 
-import common
+import os
 import dbus
+import common
 
 from service  import Characteristic, Descriptor
 from settings import Settings
 
 class TimezoneCharacteristic(Characteristic):
-    validTimezones = ["Central", "Eastern", "Mountain", "Pacific"]
+    validTimezones = ["America/Chicago", "America/New_York", "America/Denver", "America/Los_Angeles"]
 
     def __init__(self, service, settings: Settings):
         self.settings=settings
@@ -16,10 +17,16 @@ class TimezoneCharacteristic(Characteristic):
         self.add_descriptor(TimezoneDescriptor(self))
 
     def WriteValue(self, value, options):
-        global validTimezones
-        if value in validTimezones:
-            self.settings.timezone = value
+        val = ''.join([str(v) for v in value])
+
+        if val in self.validTimezones:
+            cmd="sudo timedatectl set-timezone '"+val+"'"
+            rs=os.system(cmd)
+            self.settings.timezone = val
             self.settings.update()
+        else:
+            print("invalid tz:"+val);
+	     
 
     def ReadValue(self, options):
         value = []
@@ -30,7 +37,7 @@ class TimezoneCharacteristic(Characteristic):
         return value
 
 class TimezoneDescriptor(Descriptor):
-    TIMEZONE_DESCRIPTOR_VALUE = "Timezones (Eastern, Central, Mountain, Pacific)"
+    TIMEZONE_DESCRIPTOR_VALUE = "Timezones (linux format)"
 
     def __init__(self, characteristic):
         Descriptor.__init__(
