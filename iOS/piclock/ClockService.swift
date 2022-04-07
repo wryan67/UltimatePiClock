@@ -17,13 +17,17 @@ public struct ClockService {
     public static let timeCharacteristicUUID = "00000004-9233-face-8d75-3e5b444bc3cf"
     public static let formatCharacteristicUUID = "00000005-9233-face-8d75-3e5b444bc3cf"
     public static let timezoneCharacteristicUUID = "00000006-9233-face-8d75-3e5b444bc3cf"
-   
+    public static let hh24CharacteristicUUID = "00000007-9233-face-8d75-3e5b444bc3cf"
+    public static let timeUpdateCharacteristicUUID = "00000008-9233-face-8d75-3e5b444bc3cf"
+
     public static let serviceCBUUID = CBUUID(string:uuid)
     public static let tempCharacteristicCBUUID = CBUUID(string:tempCharacteristicUUID)
     public static let unitCharacteristicCBUUID = CBUUID(string:unitCharacteristicUUID)
     public static let timeCharacteristicCBUUID = CBUUID(string:timeCharacteristicUUID)
     public static let formatCharacteristicCBUUID = CBUUID(string:formatCharacteristicUUID)
     public static let timezoneCharacteristicCBUUID = CBUUID(string:timezoneCharacteristicUUID)
+    public static let hh24CharacteristicCBUUID = CBUUID(string:hh24CharacteristicUUID)
+    public static let timeUpdateCharacteristicCBUUID = CBUUID(string:timeUpdateCharacteristicUUID)
 
     
     public static let characteristics = [
@@ -31,7 +35,9 @@ public struct ClockService {
         tempCharacteristicCBUUID,
         unitCharacteristicCBUUID,
         formatCharacteristicCBUUID,
-        timezoneCharacteristicCBUUID
+        timezoneCharacteristicCBUUID,
+        hh24CharacteristicCBUUID,
+        timeUpdateCharacteristicCBUUID
     ]
     
 }

@@ -59,12 +59,16 @@ struct ContentView: View {
     @State private var timeControl   = TimeType.minute
     @State private var timeFormat    = TimeFormat.hour12
     @State private var statusMessage = Text("Scanning...")
-
+    @State private var hh24:Int      = 0
+    @State private var mm:Int      = 0
+    
     @State var tempCharacteristic : Characteristic?
     @State var unitCharacteristic : Characteristic?
     @State var timeCharacteristic : Characteristic?
     @State var formatCharacteristic : Characteristic?
     @State var timezoneCharacteristic : Characteristic?
+    @State var hh24Characteristic : Characteristic?
+    @State var timeUpdateCharacteristic : Characteristic?
 
     @State var hostname = Text("Hostname: unknown")
     @State var units = TemperatureUnitType.celsius
@@ -95,10 +99,9 @@ struct ContentView: View {
                                     }
                                 }.pickerStyle(.segmented)
                                 Spacer().frame(width:50)
-                                Button("+") {}.frame(width: 50).buttonStyle(.bordered)
-                                Button("-") {}.frame(width: 50).buttonStyle(.bordered)
+                                Button("+") {increment()}.frame(width: 50).buttonStyle(.bordered)
+                                Button("-") {decrement()}.frame(width: 50).buttonStyle(.bordered)
                             }
-                            
                         }
 
                         
@@ -159,6 +162,63 @@ struct ContentView: View {
     func messageTime(msg: String) {
         print(msg)
         piTime = Text(msg)
+    }
+    
+    func increment() {
+        readHH24Update()
+        switch (timeControl) {
+        case .hour:
+            hh24+=1
+            if (hh24>23) {
+                hh24=0;
+            }
+        case .minute:
+            mm+=1
+            if (mm>59) {
+                mm=0
+            }
+        }
+        let newTime = String(format: "%02d:%02d", hh24, mm)
+
+        print("increment "+timeControl.rawValue+" newTime=\(newTime)")
+        
+        if (peripheral != nil) {
+            print("updte time characteristic: "+newTime)
+
+            let writeFuture = self.timeUpdateCharacteristic?.write(data:newTime.data(using: .ascii)!)
+
+            writeFuture?.onSuccess(completion: { (_) in
+                readTimezone()
+            })
+        }
+    }
+
+    func decrement() {
+        readHH24Update()
+        switch (timeControl) {
+        case .hour:
+            hh24-=1
+            if (hh24<0) {
+                hh24=23;
+            }
+        case .minute:
+            mm-=1
+            if (mm<0) {
+                mm=59
+            }
+        }
+        let newTime = String(format: "%02d:%02d", hh24, mm)
+        print("decrement "+timeControl.rawValue+" newTime=\(newTime)")
+        
+        if (peripheral != nil) {
+            print("updte time characteristic: "+newTime)
+
+            let writeFuture = self.timeUpdateCharacteristic?.write(data:newTime.data(using: .ascii)!)
+
+            writeFuture?.onSuccess(completion: { (_) in
+                readTimezone()
+            })
+        }
     }
 
 
@@ -292,7 +352,63 @@ struct ContentView: View {
             }
         }
     }
-    
+    func readHH24Update(){
+        if (peripheral != nil) {
+            guard let discoveredPeripheral = peripheral else {
+                print("e602: unknown error")
+                return
+            }
+            guard let dataCharacteristic = discoveredPeripheral.services(withUUID:ClockService.serviceCBUUID)?.first?.characteristics(withUUID:ClockService.timeUpdateCharacteristicCBUUID)?.first else {
+                print("e605 hh24 characteristic not found")
+                return
+            }
+            timeUpdateCharacteristic = dataCharacteristic
+        }
+        
+        
+        //read a value from the characteristic
+        let readFuture = self.timeUpdateCharacteristic?.read(timeout: 5)
+        readFuture?.onSuccess { (_) in
+            //the value is in the dataValue property
+            
+            let s = String(data:(self.timeUpdateCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+            
+            print("timeUpdate="+s)
+
+            let parts = s.components(separatedBy: ":")
+            
+            hh24=Int(parts[0]) ?? -1
+            mm=Int(parts[1]) ?? -1
+        }
+    }
+
+    func readHH24(){
+        if (peripheral != nil) {
+            guard let discoveredPeripheral = peripheral else {
+                print("e602: unknown error")
+                return
+            }
+            guard let dataCharacteristic = discoveredPeripheral.services(withUUID:ClockService.serviceCBUUID)?.first?.characteristics(withUUID:ClockService.hh24CharacteristicCBUUID)?.first else {
+                print("e605 hh24 characteristic not found")
+                return
+            }
+            hh24Characteristic = dataCharacteristic
+        }
+        
+        
+        //read a value from the characteristic
+        let readFuture = self.hh24Characteristic?.read(timeout: 5)
+        readFuture?.onSuccess { (_) in
+            //the value is in the dataValue property
+            
+            let s = String(data:(self.hh24Characteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+            
+            print("hh24="+s)
+
+            hh24=Int(s) ?? -1
+        }
+    }
+
     
     
     func activate() {
