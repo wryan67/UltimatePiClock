@@ -109,6 +109,8 @@ struct ContentView: View {
                                         Text(value.localizedName).tag(value)
                                     }
                                 }.pickerStyle(.segmented)
+                                 .onChange(of: timezone, perform: {(value) in modifyTimezone()})
+
                             }
                         }
                         
@@ -119,8 +121,7 @@ struct ContentView: View {
                                         Text(value.localizedName).tag(value)
                                     }
                                 }.pickerStyle(.segmented)
-                                    .onChange(of: timeFormat,
-                                              perform: {(value) in modifyTimeFormat()})
+                                 .onChange(of: timeFormat, perform: {(value) in modifyTimeFormat()})
                             }
                         }
                         
@@ -160,6 +161,29 @@ struct ContentView: View {
         piTime = Text(msg)
     }
 
+
+    func modifyTimezone() {
+        print("user clicked timezone: \(timezone.rawValue)")
+        var tz: String
+        
+        switch (timezone) {
+        case .eastern:  tz = "America/New_York"
+        case .central:  tz = "America/Chicago"
+        case .mountain: tz = "America/Denver"
+        case .pacific:  tz = "America/Los_Angeles"
+        }
+        
+        if (peripheral != nil) {
+            print("modifying timezone characteristic: "+tz)
+
+            let writeFuture = self.timezoneCharacteristic?.write(data:tz.data(using: .ascii)!)
+
+            writeFuture?.onSuccess(completion: { (_) in
+                readTimezone()
+            })
+            
+        }
+    }
     
     func modifyTimeFormat() {
         print("user clicked time format: \(timeFormat.rawValue)")
@@ -234,6 +258,41 @@ struct ContentView: View {
         }
     }
 
+    func readTimezone(){
+        if (peripheral != nil) {
+            guard let discoveredPeripheral = peripheral else {
+                print("e602: unknown error")
+                return
+            }
+            guard let dataCharacteristic = discoveredPeripheral.services(withUUID:ClockService.serviceCBUUID)?.first?.characteristics(withUUID:ClockService.timezoneCharacteristicCBUUID)?.first else {
+                print("e605 timezone characteristic not found")
+                return
+            }
+            timezoneCharacteristic = dataCharacteristic
+        }
+        
+        
+        //read a value from the characteristic
+        let readFuture = self.timezoneCharacteristic?.read(timeout: 5)
+        readFuture?.onSuccess { (_) in
+            //the value is in the dataValue property
+            
+            let s = String(data:(self.timezoneCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+            
+            print("current timezone="+s)
+
+            DispatchQueue.main.async {
+                switch (s) {
+                case "America/New_York":    timezone=Timezones.eastern
+                case "America/Chicago":     timezone=Timezones.central
+                case "America/Denver":      timezone=Timezones.mountain
+                case "America/Los_Angeles": timezone=Timezones.pacific
+                default: timezone=Timezones.eastern
+                }
+            }
+        }
+    }
+    
     
     
     func activate() {
@@ -365,6 +424,7 @@ struct ContentView: View {
 //                self.characteristicView.isHidden = false
 //            }
             //read the data from the characteristic
+            self.readTimezone()
             self.readFormat()
             self.readTime()
             //Ask the characteristic to start notifying for value change
