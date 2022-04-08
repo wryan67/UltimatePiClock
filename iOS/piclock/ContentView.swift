@@ -159,13 +159,42 @@ struct ContentView: View {
         print(msg)
     }
 
+    @State var lastTime = ""
     func messageTime(msg: String) {
-        print(msg)
+        if (msg != lastTime) {
+            print(msg)
+            lastTime=msg
+        }
         piTime = Text(msg)
     }
     
     func increment() {
+        print("increment.........")
         readHH24Update()
+        
+        //read a value from the characteristic
+        let readFuture = self.timeUpdateCharacteristic?.read(timeout: 5)
+        readFuture?.onSuccess { (_) in
+            //the value is in the dataValue property
+            
+            let s = String(data:(self.timeUpdateCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+            
+            print("timeUpdate="+s)
+
+            let parts = s.components(separatedBy: ":")
+            
+            print("timeUpdate parts[0]=\(parts[0])")
+            print("timeUpdate parts[1]=\(parts[1])")
+
+            hh24=Int(parts[0]) ?? -1
+            mm=Int(parts[1]) ?? -1
+
+            print("timeUpdate tt=\(hh24):\(mm)")
+
+        
+        
+        
+        print("increment timeControl=\(timeControl.rawValue)")
         switch (timeControl) {
         case .hour:
             hh24+=1
@@ -190,6 +219,7 @@ struct ContentView: View {
             writeFuture?.onSuccess(completion: { (_) in
                 readTimezone()
             })
+        }
         }
     }
 
@@ -366,20 +396,7 @@ struct ContentView: View {
         }
         
         
-        //read a value from the characteristic
-        let readFuture = self.timeUpdateCharacteristic?.read(timeout: 5)
-        readFuture?.onSuccess { (_) in
-            //the value is in the dataValue property
-            
-            let s = String(data:(self.timeUpdateCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
-            
-            print("timeUpdate="+s)
 
-            let parts = s.components(separatedBy: ":")
-            
-            hh24=Int(parts[0]) ?? -1
-            mm=Int(parts[1]) ?? -1
-        }
     }
 
     func readHH24(){
