@@ -18,9 +18,9 @@ public enum Timezones: String, Equatable, CaseIterable {
     var localizedName: LocalizedStringKey { LocalizedStringKey(rawValue)}
 }
 
-public enum TimeType: String, CaseIterable {
-    case hour   = "HH"
-    case minute = "MM"
+public enum MeridiemType: String, CaseIterable {
+    case am = "am"
+    case pm = "pm"
 
     var localizedName: LocalizedStringKey { LocalizedStringKey(rawValue)}
 }
@@ -31,6 +31,105 @@ public enum TimeFormat: String, CaseIterable {
 
     var localizedName: LocalizedStringKey { LocalizedStringKey(rawValue)}
 }
+
+public enum HourType: String, CaseIterable {
+    case hh01 = "01"
+    case hh02 = "02"
+    case hh03 = "03"
+    case hh04 = "04"
+    case hh05 = "05"
+    case hh06 = "06"
+    case hh07 = "07"
+    case hh08 = "08"
+    case hh09 = "09"
+    case hh10 = "10"
+    case hh11 = "11"
+    case hh12 = "12"
+//    case hh13 = "13"
+//    case hh14 = "14"
+//    case hh15 = "15"
+//    case hh16 = "16"
+//    case hh17 = "17"
+//    case hh18 = "18"
+//    case hh19 = "19"
+//    case hh20 = "20"
+//    case hh21 = "21"
+//    case hh22 = "22"
+//    case hh23 = "23"
+    
+
+    var localizedName: LocalizedStringKey { LocalizedStringKey(rawValue)}
+}
+public enum MinuteType: String, CaseIterable {
+    case mm01 = "01"
+    case mm02 = "02"
+    case mm03 = "03"
+    case mm04 = "04"
+    case mm05 = "05"
+    case mm06 = "06"
+    case mm07 = "07"
+    case mm08 = "08"
+    case mm09 = "09"
+    case mm10 = "10"
+    case mm11 = "11"
+    case mm12 = "12"
+    case mm13 = "13"
+    case mm14 = "14"
+    case mm15 = "15"
+    case mm16 = "16"
+    case mm17 = "17"
+    case mm18 = "18"
+    case mm19 = "19"
+    case mm20 = "20"
+    case mm21 = "21"
+    case mm22 = "22"
+    case mm23 = "23"
+    case mm24 = "24"
+    case mm25 = "25"
+    case mm26 = "26"
+    case mm27 = "27"
+    case mm28 = "28"
+    case mm29 = "29"
+    case mm30 = "30"
+    case mm31 = "31"
+    case mm32 = "32"
+    case mm33 = "33"
+    case mm34 = "34"
+    case mm35 = "35"
+    case mm36 = "36"
+    case mm37 = "37"
+    case mm38 = "38"
+    case mm39 = "39"
+    case mm40 = "40"
+    case mm41 = "41"
+    case mm42 = "42"
+    case mm43 = "43"
+    case mm44 = "44"
+    case mm45 = "45"
+    case mm46 = "46"
+    case mm47 = "47"
+    case mm48 = "48"
+    case mm49 = "49"
+    case mm50 = "50"
+    case mm51 = "51"
+    case mm52 = "52"
+    case mm53 = "53"
+    case mm54 = "54"
+    case mm55 = "55"
+    case mm56 = "56"
+    case mm57 = "57"
+    case mm58 = "58"
+    case mm59 = "59"
+
+    var localizedName: LocalizedStringKey { LocalizedStringKey(rawValue)}
+}
+
+extension UIPickerView {
+  open override var intrinsicContentSize: CGSize {
+      return CGSize(width: UIView.noIntrinsicMetric, height: super.intrinsicContentSize.height)
+  }
+}
+
 
 
 struct ContentView: View {
@@ -56,11 +155,11 @@ struct ContentView: View {
     @State private var selectedTab   = "One"
     @State private var timezone      = Timezones.eastern
     @State private var piTime        = Text("HH:MM TZ")
-    @State private var timeControl   = TimeType.minute
+    @State private var timeMeridiem  = MeridiemType.am
     @State private var timeFormat    = TimeFormat.hour12
     @State private var statusMessage = Text("Scanning...")
-    @State private var hh24:Int      = 0
-    @State private var mm:Int      = 0
+//    @State private var hh24:Int      = 0
+//    @State private var mm:Int        = 0
     
     @State var tempCharacteristic : Characteristic?
     @State var unitCharacteristic : Characteristic?
@@ -72,9 +171,10 @@ struct ContentView: View {
 
     @State var hostname = Text("Hostname: unknown")
     @State var units = TemperatureUnitType.celsius
+    
+    @State var adjustHH = HourType.hh01
+    @State var adjustMM = MinuteType.mm01
 
-    
-    
     var body: some View {
         TabView(selection: $selectedTab) {
             
@@ -91,16 +191,44 @@ struct ContentView: View {
                         }
                         
                         Section(header: Text("Adjust")) {
-                            HStack {
-                                Picker("Adjust", selection: $timeControl) {
-                                    ForEach(TimeType.allCases, id: \.self) { value in
-                                        Text(value.localizedName)
-                                            .tag(value)
-                                    }
-                                }.pickerStyle(.segmented)
-                                Spacer().frame(width:50)
-                                Button("+") {increment()}.frame(width: 50).buttonStyle(.bordered)
-                                Button("-") {decrement()}.frame(width: 50).buttonStyle(.bordered)
+                            VStack {
+                                HStack {
+                                    HStack (spacing:.zero){
+                                            Picker("", selection: $adjustHH) {
+                                                ForEach(HourType.allCases, id: \.self) { value in
+                                                    Text(value.localizedName)
+                                                        .tag(value)
+                                                }
+                                            }   .pickerStyle(.wheel)
+                                                .labelsHidden()
+
+                                            Text(":")//.frame(width: 10,  height:60, alignment: .center)
+
+                                            Picker(selection: $adjustMM, label: Text("")) {
+                                                    ForEach(MinuteType.allCases, id: \.self) { value in
+                                                        Text(value.localizedName)
+                                                            .tag(value)
+                                                    }
+                                                }   .pickerStyle(.wheel)
+                                                    .labelsHidden()
+                                        }.frame(height:60)
+                                         .clipped()
+
+                                    Spacer().frame(width:50)
+                                    Picker("Meridiem", selection: $timeMeridiem) {
+                                        ForEach(MeridiemType.allCases, id: \.self) { value in
+                                            Text(value.localizedName)
+                                                .tag(value)
+                                        }
+                                    }.pickerStyle(.segmented)
+                                }
+                                
+                                HStack {
+                                    Spacer()
+                                    Button("Adjust") { adjustTime() }
+                                        .buttonStyle(.borderedProminent)
+                                    Spacer()
+                                }
                             }
                         }
 
@@ -168,77 +296,25 @@ struct ContentView: View {
         piTime = Text(msg)
     }
     
-    func increment() {
-        print("increment.........")
-        readHH24Update()
+    func adjustTime() {
+        print("adjust time...")
+        
+        let hh24 = Int(adjustHH.rawValue) ?? 0
+        let mm   = Int(adjustMM.rawValue) ?? 0
+        var hh   = hh24
+        
+        if (timeMeridiem == MeridiemType.pm) {
+            hh = hh24 + 12
+            if (hh>23) {
+                hh=0
+            }
+        }
+        
         
         //read a value from the characteristic
-        let readFuture = self.timeUpdateCharacteristic?.read(timeout: 5)
-        readFuture?.onSuccess { (_) in
-            //the value is in the dataValue property
-            
-            let s = String(data:(self.timeUpdateCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
-            
-            print("timeUpdate="+s)
+        let newTime = String(format: "%02d:%02d", hh, mm)
 
-            let parts = s.components(separatedBy: ":")
-            
-            print("timeUpdate parts[0]=\(parts[0])")
-            print("timeUpdate parts[1]=\(parts[1])")
-
-            hh24=Int(parts[0]) ?? -1
-            mm=Int(parts[1]) ?? -1
-
-            print("timeUpdate tt=\(hh24):\(mm)")
-
-        
-        
-        
-        print("increment timeControl=\(timeControl.rawValue)")
-        switch (timeControl) {
-        case .hour:
-            hh24+=1
-            if (hh24>23) {
-                hh24=0;
-            }
-        case .minute:
-            mm+=1
-            if (mm>59) {
-                mm=0
-            }
-        }
-        let newTime = String(format: "%02d:%02d", hh24, mm)
-
-        print("increment "+timeControl.rawValue+" newTime=\(newTime)")
-        
-        if (peripheral != nil) {
-            print("updte time characteristic: "+newTime)
-
-            let writeFuture = self.timeUpdateCharacteristic?.write(data:newTime.data(using: .ascii)!)
-
-            writeFuture?.onSuccess(completion: { (_) in
-                readTimezone()
-            })
-        }
-        }
-    }
-
-    func decrement() {
-        readHH24Update()
-        switch (timeControl) {
-        case .hour:
-            hh24-=1
-            if (hh24<0) {
-                hh24=23;
-            }
-        case .minute:
-            mm-=1
-            if (mm<0) {
-                mm=59
-            }
-        }
-        let newTime = String(format: "%02d:%02d", hh24, mm)
-        print("decrement "+timeControl.rawValue+" newTime=\(newTime)")
+        print("adjusting newTime=\(newTime)")
         
         if (peripheral != nil) {
             print("updte time characteristic: "+newTime)
@@ -250,6 +326,7 @@ struct ContentView: View {
             })
         }
     }
+
 
 
     func modifyTimezone() {
@@ -394,37 +471,65 @@ struct ContentView: View {
             }
             timeUpdateCharacteristic = dataCharacteristic
         }
-        
-        
-
     }
 
-    func readHH24(){
-        if (peripheral != nil) {
-            guard let discoveredPeripheral = peripheral else {
-                print("e602: unknown error")
-                return
-            }
-            guard let dataCharacteristic = discoveredPeripheral.services(withUUID:ClockService.serviceCBUUID)?.first?.characteristics(withUUID:ClockService.hh24CharacteristicCBUUID)?.first else {
-                print("e605 hh24 characteristic not found")
-                return
-            }
-            hh24Characteristic = dataCharacteristic
-        }
-        
-        
+    func readHH24Init(){
+        readHH24Update()
         //read a value from the characteristic
-        let readFuture = self.hh24Characteristic?.read(timeout: 5)
+        let readFuture = self.timeUpdateCharacteristic?.read(timeout: 5)
         readFuture?.onSuccess { (_) in
             //the value is in the dataValue property
             
-            let s = String(data:(self.hh24Characteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+            let s = String(data:(self.timeUpdateCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
             
-            print("hh24="+s)
+            print("timeUpdate="+s)
 
-            hh24=Int(s) ?? -1
+            let parts = s.components(separatedBy: ":")
+            
+            print("timeUpdate parts[0]=\(parts[0])")
+            print("timeUpdate parts[1]=\(parts[1])")
+
+            var hh24=Int(parts[0]) ?? -1
+            let mm=Int(parts[1]) ?? -1
+
+            print("timeUpdate tt=\(hh24):\(mm)")
+            
+            if (hh24>12) {
+                hh24-=12
+                timeMeridiem = MeridiemType.pm
+            }
+            
+            
+            adjustHH = HourType(rawValue: String(format:"%02d",hh24)) ?? HourType.hh01
+            adjustMM = MinuteType(rawValue: parts[1]) ?? MinuteType.mm01
         }
     }
+
+    
+    
+//    func readHH24(){
+//        if (peripheral != nil) {
+//            guard let discoveredPeripheral = peripheral else {
+//                print("e602: unknown error")
+//                return
+//            }
+//            guard let dataCharacteristic = discoveredPeripheral.services(withUUID:ClockService.serviceCBUUID)?.first?.characteristics(withUUID:ClockService.hh24CharacteristicCBUUID)?.first else {
+//                print("e605 hh24 characteristic not found")
+//                return
+//            }
+//            hh24Characteristic = dataCharacteristic
+//        }
+//
+//
+//        //read a value from the characteristic
+//        let readFuture = self.hh24Characteristic?.read(timeout: 5)
+//        readFuture?.onSuccess { (_) in
+//            //the value is in the dataValue property
+//
+//            let s = String(data:(self.hh24Characteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+//
+//        }
+//    }
 
     
     
@@ -560,6 +665,7 @@ struct ContentView: View {
             self.readTimezone()
             self.readFormat()
             self.readTime()
+            self.readHH24Init()
             //Ask the characteristic to start notifying for value change
             return dataCharacteristic.startNotifying()
             }.flatMap { _ -> FutureStream<Data?> in
