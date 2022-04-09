@@ -25,10 +25,9 @@ class TimeUpdateCharacteristic(Characteristic):
         if self.settings.isAutoUpdate != "F":
             print("turning auto time update off")
             os.system("sudo timedatectl set-ntp 0")
-            self.isAutoUpdate = False
+            self.isAutoUpdate = 'F'
 
         cmd = "sudo date +%T -s "+val+":00"
-        print("changing time...\n"+cmd)
         os.system(cmd)
         print("time changed")
 
