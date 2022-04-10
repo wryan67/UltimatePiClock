@@ -20,10 +20,11 @@ extension UIPickerView {
 
 struct ContentView: View {
     @State private var selectedTab   = "One"
-
     
-    let clockService = ClockService()
-
+    
+    @State var clockService: ClockService
+    
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             
@@ -56,11 +57,11 @@ struct ContentView: View {
 }
 
 
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-            .previewInterfaceOrientation(.portraitUpsideDown)
-    }
-}
+//
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView(model)
+//            .previewInterfaceOrientation(.portraitUpsideDown)
+//    }
+//}
 

@@ -8,7 +8,7 @@
 import Foundation
 import CoreBluetooth
 
-public class ClockService {
+public class ClockService: ObservableObject {
     var timeModel = TimeModel()
 
     public static let uuid = "00000001-9233-face-8d75-3e5b444bc3cf"
