@@ -9,7 +9,7 @@ import Foundation
 import CoreBluetooth
 
 public class ClockService {
-    let timeModel = TimeModel()
+    var timeModel = TimeModel()
 
     public static let uuid = "00000001-9233-face-8d75-3e5b444bc3cf"
     public static let name = "PiClock"
