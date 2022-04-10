@@ -10,17 +10,29 @@ import SwiftUI
 import CoreBluetooth
 import BlueCapKit
 
+struct TimeModel {
+    var piTime        = Text("HH:MM TZ")
+
+    var adjustHH      = HourType.hh01
+    var adjustMM      = MinuteType.mm01
+
+    var timeMeridiem  = MeridiemType.am
+    var timezone      = Timezones.eastern
+    var timeFormat    = TimeFormat.hour12
+
+    var statusMessage = Text("Scanning...")
+}
+
 struct TimeSettingsView: View  {
+    @State var timeModel:    TimeModel
+    let clockService: ClockService
+    
     
     let manager = CentralManager()
     @State var peripheral: Peripheral?
 
-    @State private var userTimezone  = Timezones.eastern
-    @State private var piTime        = Text("HH:MM TZ")
-    @State private var timeMeridiem  = MeridiemType.am
-    @State private var timeFormat    = TimeFormat.hour12
-    @State private var statusMessage = Text("Scanning...")
-    
+
+
     @State var tempCharacteristic : Characteristic?
     @State var unitCharacteristic : Characteristic?
     @State var timeCharacteristic : Characteristic?
@@ -32,8 +44,6 @@ struct TimeSettingsView: View  {
     @State var hostname = Text("Hostname: unknown")
     @State var units = TemperatureUnitType.celsius
     
-    @State var adjustHH = HourType.hh01
-    @State var adjustMM = MinuteType.mm01
 
 
 
@@ -44,7 +54,7 @@ struct TimeSettingsView: View  {
                     HStack {
                         Text("Current Time:")
                         Spacer()
-                        piTime
+                        timeModel.piTime
                     }
                 }
                 
@@ -52,7 +62,7 @@ struct TimeSettingsView: View  {
                     VStack {
                         HStack {
                             HStack (spacing:.zero){
-                                    Picker("", selection: $adjustHH) {
+                                Picker("", selection: $timeModel.adjustHH) {
                                         ForEach(HourType.allCases, id: \.self) { value in
                                             Text(value.localizedName)
                                                 .tag(value)
@@ -62,7 +72,7 @@ struct TimeSettingsView: View  {
 
                                     Text(":")//.frame(width: 10,  height:60, alignment: .center)
 
-                                    Picker(selection: $adjustMM, label: Text("")) {
+                                Picker(selection: $timeModel.adjustMM, label: Text("")) {
                                             ForEach(MinuteType.allCases, id: \.self) { value in
                                                 Text(value.localizedName)
                                                     .tag(value)
@@ -73,7 +83,7 @@ struct TimeSettingsView: View  {
                                  .clipped()
 
                             Spacer().frame(width:50)
-                            Picker("Meridiem", selection: $timeMeridiem) {
+                            Picker("Meridiem", selection: $timeModel.timeMeridiem) {
                                 ForEach(MeridiemType.allCases, id: \.self) { value in
                                     Text(value.localizedName)
                                         .tag(value)
@@ -93,7 +103,7 @@ struct TimeSettingsView: View  {
                 
                 Section(header: Text("Timezone")) {
                     HStack {
-                        Picker("Timezone", selection: $userTimezone) {
+                        Picker("Timezone", selection: $timeModel.timezone) {
                             ForEach(Timezones.allCases, id: \.self) { value in
                                 Text(value.localizedName).tag(value)
                             }
@@ -105,12 +115,12 @@ struct TimeSettingsView: View  {
                 
                 Section(header: Text("Time Format")) {
                     HStack {
-                        Picker("Time Format", selection: $timeFormat) {
+                        Picker("Time Format", selection: $timeModel.timeFormat) {
                             ForEach(TimeFormat.allCases, id: \.self) { value in
                                 Text(value.localizedName).tag(value)
                             }
                         }.pickerStyle(.segmented)
-                            .onChange(of: timeFormat, perform: {(value) in modifyTimeFormat()})
+                            .onChange(of: timeModel.timeFormat, perform: {(value) in modifyTimeFormat()})
                     }
                 }
                 
@@ -129,17 +139,17 @@ struct TimeSettingsView: View  {
             print(msg)
             lastTime=msg
         }
-        piTime = Text(msg)
+        timeModel.piTime = Text(msg)
     }
     
     func adjustTime() {
         print("adjust time...")
         
-        let hh24 = Int(adjustHH.rawValue) ?? 0
-        let mm   = Int(adjustMM.rawValue) ?? 0
+        let hh24 = Int(timeModel.adjustHH.rawValue) ?? 0
+        let mm   = Int(timeModel.adjustMM.rawValue) ?? 0
         var hh   = hh24
         
-        if (timeMeridiem == MeridiemType.pm) {
+        if (timeModel.timeMeridiem == MeridiemType.pm) {
             hh = hh24 + 12
             if (hh>23) {
                 hh=0
@@ -166,10 +176,10 @@ struct TimeSettingsView: View  {
 
 
     func modifyTimezone() {
-        print("user clicked timezone: \(userTimezone.rawValue)")
+        print("user clicked timezone: \(timeModel.timezone.rawValue)")
         var tz: String
         
-        switch (userTimezone) {
+        switch (timeModel.timezone) {
         case .eastern:  tz = "America/New_York"
         case .central:  tz = "America/Chicago"
         case .mountain: tz = "America/Denver"
@@ -189,10 +199,10 @@ struct TimeSettingsView: View  {
     }
     
     func modifyTimeFormat() {
-        print("user clicked time format: \(timeFormat.rawValue)")
+        print("user clicked time format: \(timeModel.timeFormat.rawValue)")
         var format: String
 
-        if (timeFormat==TimeFormat.hour12) {
+        if (timeModel.timeFormat==TimeFormat.hour12) {
             format="2"
         } else {
             format="1"
@@ -253,9 +263,9 @@ struct TimeSettingsView: View  {
             DispatchQueue.main.async {
                 print("current time format="+s)
                 if (s=="1") {
-                    timeFormat = TimeFormat.hour24
+                    timeModel.timeFormat = TimeFormat.hour24
                 } else {
-                    timeFormat = TimeFormat.hour12
+                    timeModel.timeFormat = TimeFormat.hour12
                 }
             }
         }
@@ -286,11 +296,11 @@ struct TimeSettingsView: View  {
 
             DispatchQueue.main.async {
                 switch (s) {
-                case "America/New_York":    userTimezone=Timezones.eastern
-                case "America/Chicago":     userTimezone=Timezones.central
-                case "America/Denver":      userTimezone=Timezones.mountain
-                case "America/Los_Angeles": userTimezone=Timezones.pacific
-                default: userTimezone=Timezones.eastern
+                case "America/New_York":    timeModel.timezone=Timezones.eastern
+                case "America/Chicago":     timeModel.timezone=Timezones.central
+                case "America/Denver":      timeModel.timezone=Timezones.mountain
+                case "America/Los_Angeles": timeModel.timezone=Timezones.pacific
+                default: timeModel.timezone=Timezones.eastern
                 }
             }
         }
@@ -332,12 +342,12 @@ struct TimeSettingsView: View  {
             
             if (hh24>12) {
                 hh24-=12
-                timeMeridiem = MeridiemType.pm
+                timeModel.timeMeridiem = MeridiemType.pm
             }
             
             
-            adjustHH = HourType(rawValue: String(format:"%02d",hh24)) ?? HourType.hh01
-            adjustMM = MinuteType(rawValue: parts[1]) ?? MinuteType.mm01
+            timeModel.adjustHH = HourType(rawValue: String(format:"%02d",hh24)) ?? HourType.hh01
+            timeModel.adjustMM = MinuteType(rawValue: parts[1]) ?? MinuteType.mm01
         }
     }
 

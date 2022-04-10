@@ -21,12 +21,14 @@ extension UIPickerView {
 struct ContentView: View {
     @State private var selectedTab   = "One"
 
+    
+    let clockService = ClockService()
 
     var body: some View {
         TabView(selection: $selectedTab) {
             
             GroupBox() {
-                TimeSettingsView()
+                TimeSettingsView(timeModel: clockService.timeModel, clockService: clockService)
             }.tabItem {
                     Label("Time", systemImage: "clock")
             }.tag("One")
