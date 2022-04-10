@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import SwiftUI
 import CoreBluetooth
+import BlueCapKit
 
 public class ClockService: ObservableObject {
     var timeModel = TimeModel()
