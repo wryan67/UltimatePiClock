@@ -352,30 +352,6 @@ struct TimeSettingsView: View  {
     }
 
     
-    
-//    func readHH24(){
-//        if (peripheral != nil) {
-//            guard let discoveredPeripheral = peripheral else {
-//                print("e602: unknown error")
-//                return
-//            }
-//            guard let dataCharacteristic = discoveredPeripheral.services(withUUID:ClockService.serviceCBUUID)?.first?.characteristics(withUUID:ClockService.hh24CharacteristicCBUUID)?.first else {
-//                print("e605 hh24 characteristic not found")
-//                return
-//            }
-//            hh24Characteristic = dataCharacteristic
-//        }
-//
-//
-//        //read a value from the characteristic
-//        let readFuture = self.hh24Characteristic?.read(timeout: 5)
-//        readFuture?.onSuccess { (_) in
-//            //the value is in the dataValue property
-//
-//            let s = String(data:(self.hh24Characteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
-//
-//        }
-//    }
 
     
     

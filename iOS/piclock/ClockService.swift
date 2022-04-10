@@ -8,7 +8,7 @@
 import Foundation
 import CoreBluetooth
 
-public struct ClockService {
+public class ClockService {
     let timeModel = TimeModel()
 
     public static let uuid = "00000001-9233-face-8d75-3e5b444bc3cf"
@@ -41,5 +41,7 @@ public struct ClockService {
         hh24CharacteristicCBUUID,
         timeUpdateCharacteristicCBUUID
     ]
+    
+    
     
 }
