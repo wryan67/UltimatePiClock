@@ -35,6 +35,7 @@ from timezone_cx    import TimezoneCharacteristic
 from hh24_cx        import HH24Characteristic
 from time_update_cx import TimeUpdateCharacteristic
 from wifi_update_cx import WiFiUpdateCharacteristic
+from wifi_list_cx   import WiFiListCharacteristic
 
 class ServiceAdvertisement(Advertisement):
     def __init__(self, index):
@@ -55,6 +56,7 @@ class ClockService(Service):
         self.add_characteristic(HH24Characteristic(self,settings))
         self.add_characteristic(TimeUpdateCharacteristic(self,settings))
         self.add_characteristic(WiFiUpdateCharacteristic(self,settings))
+        self.add_characteristic(WiFiListCharacteristic(self, settings))
 
 
 #:########################:#
