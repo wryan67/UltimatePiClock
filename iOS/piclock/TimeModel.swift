@@ -10,6 +10,7 @@ import Foundation
 class TimeModel:ObservableObject {
     
     @Published var piTime        = "HH:MM TZ"
+    @Published var hostname      = "Unknown"
 
     @Published var adjustHH      = HourType.hh01
     @Published var adjustMM      = MinuteType.mm01
@@ -19,5 +20,6 @@ class TimeModel:ObservableObject {
     @Published var timeFormat    = TimeFormat.hour12
 
     @Published var statusMessage = "Unknown..."
+    
 }
 

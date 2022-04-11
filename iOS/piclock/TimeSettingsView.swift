@@ -19,10 +19,17 @@ struct TimeSettingsView: View  {
         VStack {
             Form {
                 Section(header: Text("Pi Clock")) {
-                    HStack {
-                        Text("Current Time:")
-                        Spacer()
-                        Text(timeModel.piTime)
+                    VStack {
+                        HStack {
+                            Text("Current Time:")
+                            Spacer()
+                            Text(timeModel.piTime)
+                        }
+                        HStack {
+                            Text("Hostname:")
+                            Spacer()
+                            Text(timeModel.hostname)
+                        }
                     }
                 }
                 

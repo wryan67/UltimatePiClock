@@ -23,7 +23,6 @@ public class ClockService {
     var hh24Characteristic : Characteristic?
     var timeUpdateCharacteristic : Characteristic?
 
-    var hostname = "unknown"
     var units = TemperatureUnitType.celsius
     
 
@@ -360,7 +359,7 @@ public class ClockService {
             }
             DispatchQueue.main.async {
                 self.message(msg: "Found peripheral \(peripheral.name)\nwith \(peripheral.services.count) services\nconnecting...")
-                self.hostname = peripheral.name
+                timeModel.hostname = peripheral.name
             }
             //connect to the peripheral in order to trigger the connected mode
             return peripheral.connect(connectionTimeout: 20, capacity: 5)
