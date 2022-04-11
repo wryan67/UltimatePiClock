@@ -10,7 +10,7 @@ import SwiftUI
 
 
 struct TimeSettingsView: View  {
-    @ObservedObject var timeModel:    TimeModel
+    @ObservedObject var model:    TimeModel
     var clockService: ClockService
     
 
@@ -23,12 +23,12 @@ struct TimeSettingsView: View  {
                         HStack {
                             Text("Current Time:")
                             Spacer()
-                            Text(timeModel.piTime)
+                            Text(model.piTime)
                         }
                         HStack {
                             Text("Name:")
                             Spacer()
-                            Text(timeModel.hostname)
+                            Text(model.hostname)
                         }
                     }
                 }
@@ -37,7 +37,7 @@ struct TimeSettingsView: View  {
                     VStack {
                         HStack {
                             HStack (spacing:.zero){
-                                Picker("", selection: $timeModel.adjustHH) {
+                                Picker("", selection: $model.adjustHH) {
                                         ForEach(HourType.allCases, id: \.self) { value in
                                             Text(value.localizedName)
                                                 .tag(value)
@@ -47,7 +47,7 @@ struct TimeSettingsView: View  {
 
                                     Text(":")//.frame(width: 10,  height:60, alignment: .center)
 
-                                Picker(selection: $timeModel.adjustMM, label: Text("")) {
+                                Picker(selection: $model.adjustMM, label: Text("")) {
                                             ForEach(MinuteType.allCases, id: \.self) { value in
                                                 Text(value.localizedName)
                                                     .tag(value)
@@ -58,7 +58,7 @@ struct TimeSettingsView: View  {
                                  .clipped()
 
                             Spacer().frame(width:50)
-                            Picker("Meridiem", selection: $timeModel.timeMeridiem) {
+                            Picker("Meridiem", selection: $model.timeMeridiem) {
                                 ForEach(MeridiemType.allCases, id: \.self) { value in
                                     Text(value.localizedName)
                                         .tag(value)
@@ -83,24 +83,24 @@ struct TimeSettingsView: View  {
                 
                 Section(header: Text("Timezone")) {
                     HStack {
-                        Picker("Timezone", selection: $timeModel.timezone) {
+                        Picker("Timezone", selection: $model.timezone) {
                             ForEach(Timezones.allCases, id: \.self) { value in
                                 Text(value.localizedName).tag(value)
                             }
                         }.pickerStyle(.segmented)
-                            .onChange(of: timeModel.timezone, perform: {(value) in clockService.modifyTimezone()})
+                            .onChange(of: model.timezone, perform: {(value) in clockService.modifyTimezone()})
 
                     }
                 }
                 
                 Section(header: Text("Time Format")) {
                     HStack {
-                        Picker("Time Format", selection: $timeModel.timeFormat) {
+                        Picker("Time Format", selection: $model.timeFormat) {
                             ForEach(TimeFormat.allCases, id: \.self) { value in
                                 Text(value.localizedName).tag(value)
                             }
                         }.pickerStyle(.segmented)
-                            .onChange(of: timeModel.timeFormat, perform: {(value) in clockService.modifyTimeFormat()})
+                            .onChange(of: model.timeFormat, perform: {(value) in clockService.modifyTimeFormat()})
                     }
                 }
                 

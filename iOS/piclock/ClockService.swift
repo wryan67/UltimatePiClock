@@ -11,6 +11,7 @@ import BlueCapKit
 
 public class ClockService {
     var timeModel: TimeModel?
+    var wifiModel: WifiModel?
     
     let manager = CentralManager()
     var peripheral: Peripheral?
@@ -22,6 +23,7 @@ public class ClockService {
     var timezoneCharacteristic : Characteristic?
     var hh24Characteristic : Characteristic?
     var timeUpdateCharacteristic : Characteristic?
+    var wifiUpdateCharacteristic : Characteristic?
 
     var units = TemperatureUnitType.celsius
     
@@ -38,6 +40,7 @@ public class ClockService {
     public static let timezoneCharacteristicUUID = "00000006-9233-face-8d75-3e5b444bc3cf"
     public static let hh24CharacteristicUUID = "00000007-9233-face-8d75-3e5b444bc3cf"
     public static let timeUpdateCharacteristicUUID = "00000008-9233-face-8d75-3e5b444bc3cf"
+    public static let wifiUpdateCharacteristicUUID = "00000009-9233-face-8d75-3e5b444bc3cf"
 
     public static let serviceCBUUID = CBUUID(string:uuid)
     public static let tempCharacteristicCBUUID = CBUUID(string:tempCharacteristicUUID)
@@ -47,6 +50,7 @@ public class ClockService {
     public static let timezoneCharacteristicCBUUID = CBUUID(string:timezoneCharacteristicUUID)
     public static let hh24CharacteristicCBUUID = CBUUID(string:hh24CharacteristicUUID)
     public static let timeUpdateCharacteristicCBUUID = CBUUID(string:timeUpdateCharacteristicUUID)
+    public static let wifiUpdateCharacteristicCBUUID = CBUUID(string:wifiUpdateCharacteristicUUID)
 
     
     public static let characteristics = [
@@ -56,7 +60,8 @@ public class ClockService {
         formatCharacteristicCBUUID,
         timezoneCharacteristicCBUUID,
         hh24CharacteristicCBUUID,
-        timeUpdateCharacteristicCBUUID
+        timeUpdateCharacteristicCBUUID,
+        wifiUpdateCharacteristicCBUUID
     ]
     
     
@@ -283,11 +288,46 @@ public class ClockService {
     }
 
     
+    func getWifiUpdateCharacteristic(){
+        if (peripheral != nil) {
+            guard let discoveredPeripheral = peripheral else {
+                print("e602: unknown error")
+                return
+            }
+            guard let dataCharacteristic = discoveredPeripheral.services(withUUID:ClockService.serviceCBUUID)?.first?.characteristics(withUUID:ClockService.wifiUpdateCharacteristicCBUUID)?.first else {
+                print("e605 hh24 characteristic not found")
+                return
+            }
+            wifiUpdateCharacteristic = dataCharacteristic
+        }
+    }
+
+    
+    func readWifiSSID(){
+        
+        getWifiUpdateCharacteristic()
+        //read a value from the characteristic
+        let readFuture = self.wifiUpdateCharacteristic?.read(timeout: 5)
+        readFuture?.onSuccess { (_) in
+            //the value is in the dataValue property
+            
+            let s = String(data:(self.wifiUpdateCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+            
+            print("wifiUpdate="+s)
+
+
+            self.wifiModel!.ssid = s
+            
+        }
+    }
+
+    
 
     
     
-    func activate(timeModel: TimeModel) {
+    func activate(timeModel: TimeModel, wifiModel: WifiModel) {
         self.timeModel=timeModel
+        self.wifiModel=wifiModel
         
         message(msg: "Activating...")
         
@@ -421,6 +461,8 @@ public class ClockService {
             self.readFormat()
             self.readTime()
             self.readHH24Init()
+            self.readWifiSSID()
+            
             //Ask the characteristic to start notifying for value change
             return dataCharacteristic.startNotifying()
             }.flatMap { _ -> FutureStream<Data?> in

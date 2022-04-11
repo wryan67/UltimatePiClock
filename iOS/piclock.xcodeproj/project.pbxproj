@@ -12,10 +12,11 @@
 		8419F33B27FBBD2F002A75D1 /* BlueCapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 848BF8AE27FBB9FA0066DC3F /* BlueCapKit.framework */; };
 		8419F33C27FBBD2F002A75D1 /* BlueCapKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 848BF8AE27FBB9FA0066DC3F /* BlueCapKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8419F33F27FBBE6B002A75D1 /* TemperatureUnitType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419F33E27FBBE6B002A75D1 /* TemperatureUnitType.swift */; };
-		846C874C2802658E001D080A /* WifiSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846C874B2802658E001D080A /* WifiSettings.swift */; };
+		846C874C2802658E001D080A /* WifiSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846C874B2802658E001D080A /* WifiSettingsView.swift */; };
 		846C874E28026825001D080A /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846C874D28026825001D080A /* Common.swift */; };
 		846C8750280299C3001D080A /* TimeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846C874F280299C3001D080A /* TimeSettingsView.swift */; };
 		8476900E2803B1FD007AD572 /* TimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8476900D2803B1FD007AD572 /* TimeModel.swift */; };
+		847690122803C8B4007AD572 /* WifiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847690112803C8B4007AD572 /* WifiModel.swift */; };
 		848BF8A827FBB7180066DC3F /* ClockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848BF8A727FBB7180066DC3F /* ClockService.swift */; };
 		84A6E62527F5294600D24BDD /* piclockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A6E62427F5294600D24BDD /* piclockApp.swift */; };
 		84A6E62727F5294600D24BDD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A6E62627F5294600D24BDD /* ContentView.swift */; };
@@ -58,11 +59,12 @@
 		8419F33727FBBCF6002A75D1 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		8419F33927FBBCFF002A75D1 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		8419F33E27FBBE6B002A75D1 /* TemperatureUnitType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemperatureUnitType.swift; sourceTree = "<group>"; };
-		846C874B2802658E001D080A /* WifiSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WifiSettings.swift; sourceTree = "<group>"; };
+		846C874B2802658E001D080A /* WifiSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WifiSettingsView.swift; sourceTree = "<group>"; };
 		846C874D28026825001D080A /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		846C874F280299C3001D080A /* TimeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSettingsView.swift; sourceTree = "<group>"; };
 		846CFEB927FBE1EC00BE2380 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8476900D2803B1FD007AD572 /* TimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeModel.swift; sourceTree = "<group>"; };
+		847690112803C8B4007AD572 /* WifiModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WifiModel.swift; sourceTree = "<group>"; };
 		848BF8A727FBB7180066DC3F /* ClockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockService.swift; sourceTree = "<group>"; };
 		848BF8A927FBB9FA0066DC3F /* BlueCapKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BlueCapKit.xcodeproj; path = BlueCap/BlueCapKit.xcodeproj; sourceTree = "<group>"; };
 		84A6E62127F5294600D24BDD /* piclock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = piclock.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -130,9 +132,10 @@
 				84A6E62627F5294600D24BDD /* ContentView.swift */,
 				848BF8A727FBB7180066DC3F /* ClockService.swift */,
 				8419F33E27FBBE6B002A75D1 /* TemperatureUnitType.swift */,
-				846C874B2802658E001D080A /* WifiSettings.swift */,
+				846C874B2802658E001D080A /* WifiSettingsView.swift */,
 				846C874F280299C3001D080A /* TimeSettingsView.swift */,
 				8476900D2803B1FD007AD572 /* TimeModel.swift */,
+				847690112803C8B4007AD572 /* WifiModel.swift */,
 				84A6E62827F5294C00D24BDD /* Assets.xcassets */,
 				84A6E62A27F5294C00D24BDD /* Preview Content */,
 			);
@@ -235,13 +238,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				846C874C2802658E001D080A /* WifiSettings.swift in Sources */,
+				846C874C2802658E001D080A /* WifiSettingsView.swift in Sources */,
 				8419F33F27FBBE6B002A75D1 /* TemperatureUnitType.swift in Sources */,
 				8476900E2803B1FD007AD572 /* TimeModel.swift in Sources */,
 				848BF8A827FBB7180066DC3F /* ClockService.swift in Sources */,
 				84A6E62727F5294600D24BDD /* ContentView.swift in Sources */,
 				846C874E28026825001D080A /* Common.swift in Sources */,
 				84A6E62527F5294600D24BDD /* piclockApp.swift in Sources */,
+				847690122803C8B4007AD572 /* WifiModel.swift in Sources */,
 				846C8750280299C3001D080A /* TimeSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

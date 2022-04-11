@@ -19,7 +19,8 @@ extension UIPickerView {
 struct ContentView: View {
     @State       var selectedTab   = "One"
 
-    @StateObject var model         = TimeModel()
+    @StateObject var timeModel     = TimeModel()
+    @StateObject var wifiModel     = WifiModel()
     var clockService               = ClockService()
 
     
@@ -27,14 +28,14 @@ struct ContentView: View {
         TabView(selection: $selectedTab) {
             
             GroupBox() {
-                TimeSettingsView(timeModel: model, clockService: clockService)
+                TimeSettingsView(model: timeModel, clockService: clockService)
             }.tabItem {
                     Label("Time", systemImage: "clock")
             }.tag("One")
 
             GroupBox() {
                 VStack {
-                    WifiSettings(ssid: "monkey")
+                    WifiSettings(model: wifiModel, clockService: clockService)
                 }
             }.tabItem {
                     Label("Wifi", systemImage: "network")
@@ -50,7 +51,7 @@ struct ContentView: View {
             }.tag("One")
 
 
-        }.onAppear(){ clockService.activate(timeModel:model)}
+        }.onAppear(){ clockService.activate(timeModel:timeModel, wifiModel:wifiModel)}
     }
 }
 
