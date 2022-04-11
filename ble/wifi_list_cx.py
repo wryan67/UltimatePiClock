@@ -1,4 +1,5 @@
 
+import time
 import os
 import dbus
 import common
@@ -8,35 +9,47 @@ from service  import Characteristic, Descriptor
 from settings import Settings
 
 class WiFiListCharacteristic(Characteristic):
+    wifiIterator=-1;
 
     def __init__(self, service, settings: Settings):
         self.notifying = False
         self.settings  = settings
 
         Characteristic.__init__(
-            self, common.WIFI_UPDATE_CHARACTERISTIC_UUID,
+            self, common.WIFI_LIST_CHARACTERISTIC_UUID,
             ["read","write"], service)
         self.add_descriptor(WiFiListDescriptor(self))
 
     def WriteValue(self, value, options):
         val = ''.join([str(v) for v in value])
 
-        print("received wifi update : "+val)
-        if self.settings.isAutoUpdate != "F":
-            print("turning auto wifi update off")
-            os.system("sudo timedatectl set-ntp 0")
-            self.isAutoUpdate = 'F'
+        print("received wifi request: "+val)
 
-        cmd = "sudo date +%T -s "+val+":00"
-        os.system(cmd)
-        print("wifi changed")
+        cmd = r"""sudo iwlist wlan0 scan |sed -ne 's/^\s*ESSID:"\(.*\)"$/\1/p' | tr -dc '[\n[:print:]]' | awk '{if (NF>0 && length<55) print}' | sort"""
+
+        allWifi=util.execList(cmd)
+
+        self.wifiIterator=-1;
+        self.wifiList=[]
+        for ssid in allWifi:
+            if len(ssid)>0:
+                self.wifiList.append(ssid)
+        self.wifiIterator=0;
 
     def get_wifi(self):
         value = []
+        now=""
 
-        cmd = 'iwgetid | sed -ne \'s/.*ESSID:"\\(.*\\)"$/\\1/p\''
+        while self.wifiIterator<0:
+            time.sleep(0.1)
 
-        now = util.execOne(cmd)
+
+        if self.wifiIterator<len(self.wifiList):
+            now = self.wifiList[self.wifiIterator]
+            self.wifiIterator+=1
+        else:
+            now="###end-transmission###"
+            self.wifiIterator=-1
 
         strtemp = str(now.strip())
         for c in strtemp:
@@ -55,13 +68,13 @@ class WiFiListDescriptor(Descriptor):
 
     def __init__(self, characteristic):
         Descriptor.__init__(
-                self, common.WIFI_UPDATE_DESCRIPTOR_UUID,
+                self, common.WIFI_LIST_DESCRIPTOR_UUID,
                 ["read"],
                 characteristic)
 
     def ReadValue(self, options):
         value = []
-        desc = self.WIFI_UPDATE_DESCRIPTOR_VALUE
+        desc = self.WIFI_LIST_DESCRIPTOR_VALUE
 
         for c in desc:
             value.append(dbus.Byte(c.encode()))
