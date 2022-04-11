@@ -9,11 +9,10 @@ import SwiftUI
 
 @main
 struct piclockApp: App {
-    @StateObject private var model = ClockService()
     
     var body: some Scene {
         WindowGroup {
-            ContentView(clockService: model)
+            ContentView()
         }
     }
 }

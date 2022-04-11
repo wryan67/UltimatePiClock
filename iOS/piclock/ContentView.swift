@@ -16,20 +16,18 @@ extension UIPickerView {
   }
 }
 
-
-
 struct ContentView: View {
-    @State private var selectedTab   = "One"
-    
-    
-    @State var clockService: ClockService
-    
+    @State       var selectedTab   = "One"
+
+    @StateObject var model         = TimeModel()
+    var clockService               = ClockService()
+
     
     var body: some View {
         TabView(selection: $selectedTab) {
             
             GroupBox() {
-                TimeSettingsView(timeModel: clockService.timeModel, clockService: clockService)
+                TimeSettingsView(timeModel: model, clockService: clockService)
             }.tabItem {
                     Label("Time", systemImage: "clock")
             }.tag("One")
@@ -52,7 +50,7 @@ struct ContentView: View {
             }.tag("One")
 
 
-        }
+        }.onAppear(){ clockService.activate(timeModel:model)}
     }
 }
 
