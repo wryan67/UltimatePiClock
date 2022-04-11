@@ -24,6 +24,7 @@ public class ClockService {
     var hh24Characteristic : Characteristic?
     var timeUpdateCharacteristic : Characteristic?
     var wifiUpdateCharacteristic : Characteristic?
+    var wifiListCharacteristic : Characteristic?
 
     var units = TemperatureUnitType.celsius
     
@@ -41,6 +42,7 @@ public class ClockService {
     public static let hh24CharacteristicUUID = "00000007-9233-face-8d75-3e5b444bc3cf"
     public static let timeUpdateCharacteristicUUID = "00000008-9233-face-8d75-3e5b444bc3cf"
     public static let wifiUpdateCharacteristicUUID = "00000009-9233-face-8d75-3e5b444bc3cf"
+    public static let wifiListCharacteristicUUID = "00000010-9233-face-8d75-3e5b444bc3cf"
 
     public static let serviceCBUUID = CBUUID(string:uuid)
     public static let tempCharacteristicCBUUID = CBUUID(string:tempCharacteristicUUID)
@@ -51,6 +53,7 @@ public class ClockService {
     public static let hh24CharacteristicCBUUID = CBUUID(string:hh24CharacteristicUUID)
     public static let timeUpdateCharacteristicCBUUID = CBUUID(string:timeUpdateCharacteristicUUID)
     public static let wifiUpdateCharacteristicCBUUID = CBUUID(string:wifiUpdateCharacteristicUUID)
+    public static let wifiListCharacteristicCBUUID = CBUUID(string:wifiListCharacteristicUUID)
 
     
     public static let characteristics = [
@@ -61,7 +64,8 @@ public class ClockService {
         timezoneCharacteristicCBUUID,
         hh24CharacteristicCBUUID,
         timeUpdateCharacteristicCBUUID,
-        wifiUpdateCharacteristicCBUUID
+        wifiUpdateCharacteristicCBUUID,
+        wifiListCharacteristicCBUUID
     ]
     
     
@@ -301,6 +305,19 @@ public class ClockService {
             wifiUpdateCharacteristic = dataCharacteristic
         }
     }
+    func getWifiListCharacteristic(){
+        if (peripheral != nil) {
+            guard let discoveredPeripheral = peripheral else {
+                print("e602: unknown error")
+                return
+            }
+            guard let dataCharacteristic = discoveredPeripheral.services(withUUID:ClockService.serviceCBUUID)?.first?.characteristics(withUUID:ClockService.wifiListCharacteristicCBUUID)?.first else {
+                print("e605 hh24 characteristic not found")
+                return
+            }
+            wifiListCharacteristic = dataCharacteristic
+        }
+    }
 
     
     func readWifiSSID(){
@@ -321,6 +338,61 @@ public class ClockService {
         }
     }
 
+    func readWifiListFuture(readFuture: Future<Void>) {
+
+
+            
+        readFuture.onSuccess { (_) in
+            let s = String(data:(self.wifiListCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+
+            print("wifiList: "+s)
+
+            if (s == "###end-transmission###") {
+                print("read list terminated")
+                return
+            } else {
+                let readFuture = self.wifiListCharacteristic?.read(timeout: 20)
+                self.readWifiListFuture(readFuture: readFuture!)
+            }
+        }
+
+        
+    }
+    
+    
+    func readWifiList() {
+        getWifiListCharacteristic()
+        print("reading wifi list")
+        let format = "scan"
+
+        if (peripheral != nil) {
+            print("wifi list characteristic: "+format)
+
+            let writeFuture = self.wifiListCharacteristic?.write(data:format.data(using: .ascii)!, timeout: 30)
+
+            writeFuture?.onSuccess(completion: { (_) in
+                print("reading wifi list...")
+                let readFuture = self.wifiListCharacteristic?.read(timeout: 20)
+                self.readWifiListFuture(readFuture: readFuture!)
+
+//                let readFuture = self.wifiListCharacteristic?.read(timeout: 30)
+//                readFuture?.onSuccess { (_) in
+//                    //the value is in the dataValue property
+//
+//                    let s = String(data:(self.wifiUpdateCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+//
+//                    print("wifiList1: "+s)
+//
+//
+//                }
+                
+            })
+            
+        }
+
+
+    }
+    
     
 
     
@@ -462,6 +534,7 @@ public class ClockService {
             self.readTime()
             self.readHH24Init()
             self.readWifiSSID()
+            self.readWifiList()
             
             //Ask the characteristic to start notifying for value change
             return dataCharacteristic.startNotifying()
