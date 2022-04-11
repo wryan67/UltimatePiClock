@@ -72,6 +72,11 @@ struct TimeSettingsView: View  {
                                 .buttonStyle(.borderedProminent)
                             Spacer()
                         }
+                        HStack {
+                            Text("Note:  Manually adjusting the time will disable automatic time updates")
+                                .foregroundColor(.blue)
+                                .fontWeight(Font.Weight.thin)
+                        }
                     }
                 }
 
