@@ -26,7 +26,7 @@ struct TimeSettingsView: View  {
                             Text(timeModel.piTime)
                         }
                         HStack {
-                            Text("Hostname:")
+                            Text("Name:")
                             Spacer()
                             Text(timeModel.hostname)
                         }
