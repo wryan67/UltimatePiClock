@@ -76,7 +76,7 @@ struct TimeSettingsView: View  {
                                 Text(value.localizedName).tag(value)
                             }
                         }.pickerStyle(.segmented)
-                            .onChange(of: timezone, perform: {(value) in clockService.modifyTimezone()})
+                            .onChange(of: timeModel.timezone, perform: {(value) in clockService.modifyTimezone()})
 
                     }
                 }
