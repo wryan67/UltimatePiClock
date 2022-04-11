@@ -25,7 +25,7 @@ class WiFiListCharacteristic(Characteristic):
 
         print("received wifi request: "+val)
 
-        cmd = r"""sudo iwlist wlan0 scan |sed -ne 's/^\s*ESSID:"\(.*\)"$/\1/p' | tr -dc '[\n[:print:]]' | awk '{if (NF>0 && length<55) print}' | sort"""
+        cmd = r"""sudo iwlist wlan0 scan |sed -ne 's/^\s*ESSID:"\(.*\)"$/\1/p' | tr -dc '[\n[:print:]]' | awk '{if (NF>0 && length<55) print}' | sort -u"""
 
         allWifi=util.execList(cmd)
 
