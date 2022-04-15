@@ -13,6 +13,8 @@ class WifiModel:ObservableObject {
 
     @Published var statusMessage = "Unknown..."
     
+    @Published var networks: [String] = []
+    
 }
 
 

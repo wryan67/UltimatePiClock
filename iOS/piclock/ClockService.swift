@@ -351,6 +351,7 @@ public class ClockService {
                 print("read list terminated")
                 return
             } else {
+                self.wifiModel?.networks.append(s)
                 let readFuture = self.wifiListCharacteristic?.read(timeout: 20)
                 self.readWifiListFuture(readFuture: readFuture!)
             }
