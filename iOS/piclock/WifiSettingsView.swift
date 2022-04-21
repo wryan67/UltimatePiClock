@@ -60,9 +60,6 @@ struct WifiSettings: View  {
 
                     Section("Networks") {
                         VStack {
-//                            if model.isScanning {
-//                                
-//                            }
                             ScrollView {
                                 VStack {
                                     List(model.networks, id: \.self) { network in
@@ -74,7 +71,6 @@ struct WifiSettings: View  {
                                             .frame(height:60)
                                     }
                                 }   .padding(0)
-                                // .frame(height:(60.0*CGFloat(Float(model.networks.count))))
                                     .frame(height:(60.0*CGFloat(
                                         Float(model.networks.count+1)
                                     )))
