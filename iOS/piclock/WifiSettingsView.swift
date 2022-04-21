@@ -17,6 +17,7 @@ struct WifiSettings: View  {
     @State private var contentSize: CGSize = .zero
     @State private var showPasswd = false
     
+    let networkHeight = 50.0
 
     var body: some View {
         GeometryReader { geometry in
@@ -68,15 +69,15 @@ struct WifiSettings: View  {
                                             model.newSSID = network
                                         }
                                             .buttonStyle(.plain)
-                                            .frame(height:60)
+                                            .frame(height:networkHeight)
                                     }
                                 }   .padding(0)
-                                    .frame(height:(60.0*CGFloat(
+                                    .frame(height:(networkHeight*CGFloat(
                                         Float(model.networks.count+1)
                                     )))
                              
                             }   .padding(0)
-                                .frame(height:(60.0*4))
+                                .frame(height:(networkHeight*5))
 
                             Button("Refresh") {
                                 print("refresh netowks....")
