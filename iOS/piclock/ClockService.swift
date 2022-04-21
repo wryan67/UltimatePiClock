@@ -349,6 +349,9 @@ public class ClockService {
 
             if (s == "###end-transmission###") {
                 print("read list terminated")
+                self.wifiModel?.isScanning = false;
+                self.wifiModel?.networks.removeFirst()
+            
                 return
             } else {
                 self.wifiModel?.networks.append(s)
@@ -362,6 +365,10 @@ public class ClockService {
     
     
     func readWifiList() {
+        self.wifiModel?.isScanning = true;
+        self.wifiModel?.networks.removeAll()
+        self.wifiModel?.networks.append(String("Scanning..."))
+
         getWifiListCharacteristic()
         print("reading wifi list")
         let format = "scan"
@@ -374,19 +381,7 @@ public class ClockService {
             writeFuture?.onSuccess(completion: { (_) in
                 print("reading wifi list...")
                 let readFuture = self.wifiListCharacteristic?.read(timeout: 20)
-                self.readWifiListFuture(readFuture: readFuture!)
-
-//                let readFuture = self.wifiListCharacteristic?.read(timeout: 30)
-//                readFuture?.onSuccess { (_) in
-//                    //the value is in the dataValue property
-//
-//                    let s = String(data:(self.wifiUpdateCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
-//
-//                    print("wifiList1: "+s)
-//
-//
-//                }
-                
+                self.readWifiListFuture(readFuture: readFuture!)                
             })
             
         }

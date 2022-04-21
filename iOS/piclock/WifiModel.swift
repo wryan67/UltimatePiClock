@@ -8,6 +8,7 @@
 import Foundation
 
 class WifiModel:ObservableObject {
+    @Published var isScanning    = true
     
     @Published var ssid          = "unknown"
 
@@ -15,6 +16,9 @@ class WifiModel:ObservableObject {
     
     @Published var networks: [String] = []
     
+    @Published var newSSID       = ""
+    
+    @Published var passwd        = ""
 }
 
 

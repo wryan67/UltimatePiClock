@@ -56,11 +56,11 @@ struct ContentView: View {
 }
 
 
-//
-//struct ContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ContentView(model)
-//            .previewInterfaceOrientation(.portraitUpsideDown)
-//    }
-//}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+            .previewInterfaceOrientation(.portraitUpsideDown)
+    }
+}
 
