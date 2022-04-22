@@ -21,11 +21,21 @@ class WiFiUpdateCharacteristic(Characteristic):
     def WriteValue(self, value, options):
         val = ''.join([str(v) for v in value])
 
-        print("received wifi list request : "+val)
+        print("received wifi update request : "+val)
 
-        cmd = "sudo date +%T -s "+val+":00"
-        os.system(cmd)
-        print("wifi changed")
+        (ssid,passwd) = val.split("þ")
+
+
+        cmd = "sed -e 'sþ@SSID@þ%sþ' -e 'þ@PASSWD@þ%sþ' wpa_supplicant.template > /tmp/wpa_supplicant.template" % (ssid,passwd)
+
+        print(cmd)
+        rs=os.system(cmd)
+        if rs==0:
+            rs=os.system("sudo cp /tmp/wpa_supplicant.template /etc/wpa_supplicant/wpa_supplicant.template")
+            if rs==0:
+                rs=os.system("sudo wpa_cli -i wlan0 reconfigure")
+                if rs==0:
+                    print("wifi changed")
 
     def get_wifi(self):
         value = []
