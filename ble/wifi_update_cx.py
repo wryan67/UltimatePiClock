@@ -23,19 +23,27 @@ class WiFiUpdateCharacteristic(Characteristic):
 
         print("received wifi update request : "+val)
 
-        (ssid,passwd) = val.split("þ")
+        (ssid,passwd) = val.split(":<>:")
+
+        print("received wifi new SSID/Passwd: " + ssid.strip() + "/" + passwd.strip())
+
+        userHome = util.getHome()
+
+        cmd = "find . "+userHome+"/apps "+userHome+"/projects "+userHome+" -type f -name wpa_supplicant.template | head -1"
+
+        wpa_supplicant = util.execOne(cmd)
 
 
-        cmd = "sed -e 'sþ@SSID@þ%sþ' -e 'þ@PASSWD@þ%sþ' wpa_supplicant.template > /tmp/wpa_supplicant.template" % (ssid,passwd)
+        fmt = "sed -e 's"+chr(0x1f)+"@SSID@"+chr(0x1f)+"%s"+chr(0x1f)+"' -e 's"+chr(0x1f)+"@PASSWD@"+chr(0x1f)+"%s"+chr(0x1f)+"' "+wpa_supplicant+" > /tmp/wpa_supplicant.template"
+        cmd = fmt % (ssid.strip(),passwd.strip())
 
-        print(cmd)
         rs=os.system(cmd)
         if rs==0:
-            rs=os.system("sudo cp /tmp/wpa_supplicant.template /etc/wpa_supplicant/wpa_supplicant.template")
+          rs=os.system("sudo cp /tmp/wpa_supplicant.template /etc/wpa_supplicant/wpa_supplicant.conf")
+          if rs==0:
+            rs=os.system("sudo wpa_cli -i wlan0 reconfigure")
             if rs==0:
-                rs=os.system("sudo wpa_cli -i wlan0 reconfigure")
-                if rs==0:
-                    print("wifi changed")
+                print("wifi changed")
 
     def get_wifi(self):
         value = []
