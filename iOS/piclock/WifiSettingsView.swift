@@ -52,7 +52,7 @@ struct WifiSettings: View  {
                         HStack {
                             Spacer()
                             Button ("Submit") {
-                                print("submit new network credentials..")
+                                clockService.updateWifiSSID();
                             }   .buttonStyle(.bordered)
                                 .foregroundColor(.white)
                         }.frame(alignment: .trailing)
@@ -81,6 +81,7 @@ struct WifiSettings: View  {
 
                             Button("Refresh") {
                                 print("refresh netowks....")
+                                clockService.readWifiSSID()
                                 clockService.readWifiList()
                             }   .buttonStyle(.bordered)
                                 .padding(.top, 5.0)

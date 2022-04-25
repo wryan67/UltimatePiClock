@@ -319,6 +319,26 @@ public class ClockService {
         }
     }
 
+    func updateWifiSSID() {
+        getWifiUpdateCharacteristic()
+
+        //        _ = "ab;ljkasdf"
+        let credentials = String("\(wifiModel!.newSSID):<>:\(wifiModel!.passwd)")
+        print("new wifi: \(credentials)")
+        
+        let writeFuture = self.wifiUpdateCharacteristic?.write(data:credentials.data(using: .windowsCP1251)!, timeout: 30)
+//        let writeFutur2 = self.wifiListCharacteristic?  .write(data:format     .data(using: .ascii        )!, timeout: 30)
+
+        
+        writeFuture?.onSuccess(completion: { (_) in
+            print("reading wifi ssid...")
+            self.readWifiSSID()
+        })
+
+        
+
+    }
+    
     
     func readWifiSSID(){
         
@@ -331,7 +351,6 @@ public class ClockService {
             let s = String(data:(self.wifiUpdateCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
             
             print("wifiUpdate="+s)
-
 
             self.wifiModel!.ssid = s
             
