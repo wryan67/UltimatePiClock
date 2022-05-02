@@ -44,7 +44,9 @@ struct ContentView: View {
 
             GroupBox() {
                 VStack {
-                    Text("tab 3")
+                    Image("under-construction")
+                        .resizable()
+                        .scaledToFit()
                 }
             }.tabItem {
                     Label("Photos", systemImage: "photo")
