@@ -64,21 +64,27 @@ struct WifiSettings: View  {
                     Section("Networks") {
                         VStack {
                             ScrollView {
-                                VStack {
+                                VStack(spacing: 0) {
                                     ForEach(model.networks, id: \.self) { network in
-                                        Button(network) {
-                                            print("User selected: "+network)
-                                            model.newSSID = network
+                                        VStack(spacing:0) {
+                                            Button(network) {
+                                                print("User selected: "+network)
+                                                model.newSSID = network
+                                            }
+                                                .buttonStyle(.plain)
+                                                .frame(height:networkHeight)
+                                            Text("-")
+                                                .frame(minWidth:150, maxHeight:1)
+                                                .clipped()
+                                                .border(Color.gray)
                                         }
-                                            .buttonStyle(.plain)
-                                            .frame(height:networkHeight)
                                     }
                                     
                                 }   .padding(0)
                                     .frame(maxWidth: .infinity)
                              
                             }   .padding(0)
-                                .frame(height:(networkHeight*4))
+                                .frame(height:(networkHeight*3.6))
 
 
                             Button("Refresh") {
