@@ -59,6 +59,7 @@ struct WifiSettings: View  {
                                     .labelsHidden()
                                     .onChange(of: model.autoTimeUpdate) { value in
                                         print("set auto-time-update: ", value)
+                                        clockService.updateAutoTimeCharacteristic()
                                     }
                                     
                             }

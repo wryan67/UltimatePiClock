@@ -11,7 +11,8 @@ class WifiModel:ObservableObject {
     @Published var isScanning     = true
     
     @Published var isUpdatingWifi = false
-    
+    @Published var isUpdatingAutoTime = false
+
     @Published var ssid          = "unknown"
 
     @Published var statusMessage = "Unknown..."

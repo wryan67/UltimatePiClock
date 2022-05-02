@@ -25,6 +25,7 @@ public class ClockService {
     var timeUpdateCharacteristic : Characteristic?
     var wifiUpdateCharacteristic : Characteristic?
     var wifiListCharacteristic : Characteristic?
+    var autoTimeCharacteristic : Characteristic?
 
     var units = TemperatureUnitType.celsius
     
@@ -43,6 +44,7 @@ public class ClockService {
     public static let timeUpdateCharacteristicUUID = "00000008-9233-face-8d75-3e5b444bc3cf"
     public static let wifiUpdateCharacteristicUUID = "00000009-9233-face-8d75-3e5b444bc3cf"
     public static let wifiListCharacteristicUUID = "00000010-9233-face-8d75-3e5b444bc3cf"
+    public static let autoTimeCharacteristicUUID = "00000011-9233-face-8d75-3e5b444bc3cf"
 
     public static let serviceCBUUID = CBUUID(string:uuid)
     public static let tempCharacteristicCBUUID = CBUUID(string:tempCharacteristicUUID)
@@ -54,6 +56,7 @@ public class ClockService {
     public static let timeUpdateCharacteristicCBUUID = CBUUID(string:timeUpdateCharacteristicUUID)
     public static let wifiUpdateCharacteristicCBUUID = CBUUID(string:wifiUpdateCharacteristicUUID)
     public static let wifiListCharacteristicCBUUID = CBUUID(string:wifiListCharacteristicUUID)
+    public static let autoTimeCharacteristicCBUUID = CBUUID(string:autoTimeCharacteristicUUID)
 
     
     public static let characteristics = [
@@ -65,7 +68,8 @@ public class ClockService {
         hh24CharacteristicCBUUID,
         timeUpdateCharacteristicCBUUID,
         wifiUpdateCharacteristicCBUUID,
-        wifiListCharacteristicCBUUID
+        wifiListCharacteristicCBUUID,
+        autoTimeCharacteristicCBUUID
     ]
     
     
@@ -108,6 +112,7 @@ public class ClockService {
             let writeFuture = self.timeUpdateCharacteristic?.write(data:newTime.data(using: .ascii)!)
 
             writeFuture?.onSuccess(completion: { (_) in
+                self.readAutoTimeCharacteristic()
                 self.readTimezone()
             })
         }
@@ -318,6 +323,19 @@ public class ClockService {
             wifiListCharacteristic = dataCharacteristic
         }
     }
+    func getAutoTimeCharacteristic(){
+        if (peripheral != nil) {
+            guard let discoveredPeripheral = peripheral else {
+                print("e602: unknown error")
+                return
+            }
+            guard let dataCharacteristic = discoveredPeripheral.services(withUUID:ClockService.serviceCBUUID)?.first?.characteristics(withUUID:ClockService.autoTimeCharacteristicCBUUID)?.first else {
+                print("e605 hh24 characteristic not found")
+                return
+            }
+            autoTimeCharacteristic = dataCharacteristic
+        }
+    }
 
     func updateWifiSSID() {
         wifiModel?.isUpdatingWifi = true
@@ -336,11 +354,52 @@ public class ClockService {
             print("reading wifi ssid...")
             self.readWifiSSID()
         })
+    }
 
+    func updateAutoTimeCharacteristic() {
+        wifiModel?.isUpdatingAutoTime = true
+        getAutoTimeCharacteristic()
+
+        var value: String
         
+        if (self.wifiModel!.autoTimeUpdate) {
+            value = "1"
+        } else {
+            value = "0"
+        }
 
+        print("new auto time update value: \(value)")
+        
+        let writeFuture = self.autoTimeCharacteristic?.write(data:value.data(using: .windowsCP1251)!, timeout: 30)
+        
+        writeFuture?.onSuccess(completion: { (_) in
+            self.readAutoTimeCharacteristic()
+            self.wifiModel?.isUpdatingAutoTime = false
+        })
     }
     
+    
+    func readAutoTimeCharacteristic(){
+       
+        getAutoTimeCharacteristic()
+        //read a value from the characteristic
+        let readFuture = self.autoTimeCharacteristic?.read(timeout: 5)
+        readFuture?.onSuccess { (_) in
+            //the value is in the dataValue property
+            
+            let s = String(data:(self.autoTimeCharacteristic?.dataValue)!, encoding: .ascii) ?? "unknown"
+            
+            print("auto-time-update-characteristic="+s)
+
+            if (s=="active") {
+                self.wifiModel?.autoTimeUpdate = true
+            } else {
+                self.wifiModel?.autoTimeUpdate = false
+            }
+            
+        }
+    }
+
     
     func readWifiSSID(){
         
@@ -550,6 +609,7 @@ public class ClockService {
             self.readFormat()
             self.readTime()
             self.readHH24Init()
+            self.readAutoTimeCharacteristic()
             self.readWifiSSID()
             self.readWifiList()
             
