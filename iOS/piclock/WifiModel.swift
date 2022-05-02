@@ -21,6 +21,8 @@ class WifiModel:ObservableObject {
     @Published var newSSID       = ""
     
     @Published var passwd        = ""
+    
+    @Published var autoTimeUpdate = true
 }
 
 

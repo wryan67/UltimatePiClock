@@ -50,6 +50,15 @@ struct WifiSettings: View  {
                             }).foregroundColor( !showPasswd ? .gray : .white)
                         }
                         HStack {
+                            HStack(spacing:0) {
+                                Text("Time: auto\nupdate")
+                                    .multilineTextAlignment(.trailing)
+                                Spacer().frame(width:5)
+                                Toggle(isOn: $model.autoTimeUpdate) {
+                                    Text("")
+                                }   .padding(0)
+                                    .labelsHidden()
+                            }
                             Spacer()
                             Button ("Submit") {
                                 clockService.updateWifiSSID();
