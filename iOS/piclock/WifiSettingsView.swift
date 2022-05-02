@@ -64,8 +64,19 @@ struct WifiSettings: View  {
                     Section("Networks") {
                         VStack {
                             ScrollView {
-                                VStack(spacing: 0) {
-                                    ForEach(model.networks, id: \.self) { network in
+                                VStack(spacing:0) {
+                                    ForEach(Array(model.networks.enumerated()), id: \.offset) { index, network in
+                                        
+                                        if (index==0) {
+                                            Text("first").hidden()
+                                        } else {
+                                            Text("-")
+                                                .frame(minWidth:geometry.size.width * 0.60, maxHeight:1)
+                                                .clipped()
+                                                .border(Color.gray)
+                                        }
+
+
                                         VStack(spacing:0) {
                                             Button(network) {
                                                 print("User selected: "+network)
@@ -73,18 +84,15 @@ struct WifiSettings: View  {
                                             }
                                                 .buttonStyle(.plain)
                                                 .frame(height:networkHeight)
-                                            Text("-")
-                                                .frame(minWidth:geometry.size.width * 0.60, maxHeight:1)
-                                                .clipped()
-                                                .border(Color.gray)
+
                                         }
                                     }
-                                    
+
                                 }   .padding(0)
                                     .frame(maxWidth: .infinity)
                              
                             }   .padding(0)
-                                .frame(height:(networkHeight*3.6))
+                                .frame(height:(networkHeight*3.99))
 
 
                             Button("Refresh") {
