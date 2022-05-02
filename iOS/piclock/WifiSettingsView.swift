@@ -65,21 +65,21 @@ struct WifiSettings: View  {
                         VStack {
                             ScrollView {
                                 VStack {
-                                    List(model.networks, id: \.self) { network in
-                                        Button(network){
+                                    ForEach(model.networks, id: \.self) { network in
+                                        Button(network) {
                                             print("User selected: "+network)
                                             model.newSSID = network
                                         }
                                             .buttonStyle(.plain)
                                             .frame(height:networkHeight)
                                     }
+                                    
                                 }   .padding(0)
-                                    .frame(height:(networkHeight*CGFloat(
-                                        Float(model.networks.count+1)
-                                    )))
+                                    .frame(maxWidth: .infinity)
                              
                             }   .padding(0)
-                                .frame(height:(networkHeight*5))
+                                .frame(height:(networkHeight*4))
+
 
                             Button("Refresh") {
                                 print("refresh netowks....")
