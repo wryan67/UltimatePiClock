@@ -74,7 +74,7 @@ struct WifiSettings: View  {
                                                 .buttonStyle(.plain)
                                                 .frame(height:networkHeight)
                                             Text("-")
-                                                .frame(minWidth:150, maxHeight:1)
+                                                .frame(minWidth:geometry.size.width * 0.60, maxHeight:1)
                                                 .clipped()
                                                 .border(Color.gray)
                                         }
