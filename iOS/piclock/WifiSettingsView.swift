@@ -54,10 +54,13 @@ struct WifiSettings: View  {
                                 Text("Time: auto\nupdate")
                                     .multilineTextAlignment(.trailing)
                                 Spacer().frame(width:5)
-                                Toggle(isOn: $model.autoTimeUpdate) {
-                                    Text("")
-                                }   .padding(0)
+                                Toggle("", isOn: $model.autoTimeUpdate)
+                                    .padding(0)
                                     .labelsHidden()
+                                    .onChange(of: model.autoTimeUpdate) { value in
+                                        print("set auto-time-update: ", value)
+                                    }
+                                    
                             }
                             Spacer()
                             Button ("Submit") {
