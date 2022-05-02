@@ -8,7 +8,9 @@
 import Foundation
 
 class WifiModel:ObservableObject {
-    @Published var isScanning    = true
+    @Published var isScanning     = true
+    
+    @Published var isUpdatingWifi = false
     
     @Published var ssid          = "unknown"
 

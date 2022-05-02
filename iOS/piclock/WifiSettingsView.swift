@@ -55,6 +55,8 @@ struct WifiSettings: View  {
                                 clockService.updateWifiSSID();
                             }   .buttonStyle(.bordered)
                                 .foregroundColor(.white)
+                                .disabled(model.isUpdatingWifi)
+
                         }.frame(alignment: .trailing)
                     }
                     

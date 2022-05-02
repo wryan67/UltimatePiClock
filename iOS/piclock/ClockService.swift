@@ -320,6 +320,7 @@ public class ClockService {
     }
 
     func updateWifiSSID() {
+        wifiModel?.isUpdatingWifi = true
         getWifiUpdateCharacteristic()
 
         //        _ = "ab;ljkasdf"
@@ -331,6 +332,7 @@ public class ClockService {
 
         
         writeFuture?.onSuccess(completion: { (_) in
+            self.wifiModel?.isUpdatingWifi = false
             print("reading wifi ssid...")
             self.readWifiSSID()
         })
