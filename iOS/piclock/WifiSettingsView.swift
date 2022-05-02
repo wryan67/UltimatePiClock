@@ -81,7 +81,7 @@ struct WifiSettings: View  {
                                     ForEach(Array(model.networks.enumerated()), id: \.offset) { index, network in
                                         
                                         if (index==0) {
-                                            Text("first").hidden()
+                                            Spacer().frame(height:0)
                                         } else {
                                             Text("-")
                                                 .frame(minWidth:geometry.size.width * 0.60, maxHeight:1)
