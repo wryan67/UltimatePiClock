@@ -105,7 +105,7 @@ struct WifiSettings: View  {
                                     .frame(maxWidth: .infinity)
                              
                             }   .padding(0)
-                                .frame(height:(networkHeight*4.02))
+                                .frame(height:(networkHeight*4.61))
 
 
                             Button("Refresh") {
